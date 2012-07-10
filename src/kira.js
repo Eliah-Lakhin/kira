@@ -14,8 +14,15 @@
  limitations under the License.
 */
 
-var Kira = (function() {
+(function() {
+    var context = this;
+    var conflicted = this.Kira;
     var Kira = {};
 
-    return Kira;
+    Kira.noConflict = function() {
+        context.Kira = conflicted;
+        return Kira;
+    };
+
+    context.Kira = Kira;
 })();
