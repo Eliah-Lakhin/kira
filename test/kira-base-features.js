@@ -17,5 +17,11 @@
 TestCase("Kira base features", {
     "testKiraObjectDefinition": function() {
         assertNotUndefined(Kira);
+    },
+    "testNoConflicts": function() {
+        assertNotUndefined(Kira);
+        var reference = Kira.noConflict();
+        assertUndefined(Kira);
+        assertNotUndefined(reference);
     }
 });
