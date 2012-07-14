@@ -67,6 +67,10 @@
         return result;
     };
 
+    Kira.Generator.prototype.cache = function() {
+        return Kira.cachedGenerator(this);
+    };
+
     Kira.Generator.prototype.map = function(functor) {
         return Kira.mappedGenerator(this, functor);
     };
@@ -214,6 +218,29 @@
                         return functor(sourceElement);
                     }
                 }
+            }
+        });
+    };
+
+    Kira.cachedGenerator = function(source) {
+        var generator;
+        return new Kira.Generator(function() {
+            if (generator === undefined) {
+                var cache = [];
+                var sourceIterator = source.iterator();
+                return {
+                    next: function() {
+                        var sourceElement = sourceIterator.next();
+                        if (sourceElement !== undefined) {
+                            cache.push(sourceElement);
+                        } else {
+                            generator = Kira.arrayGenerator(cache);
+                        }
+                        return sourceElement;
+                    }
+                }
+            } else {
+                return generator.iterator();
             }
         });
     };

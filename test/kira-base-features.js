@@ -139,5 +139,14 @@ TestCase("Kira base features", {
         // get
         assertEquals(Kira([0, 1, 3, 4]).get(3), [4]);
         assertEquals(Kira([0, 1, 3, 4]).get(5), []);
+    },
+    "testCachedGenerator": function() {
+        var source = [0, 1, 3, 4];
+        var generator = Kira(source);
+        var cached = Kira(source).cache();
+        assertEquals(cached.toArray(), [0, 1, 3, 4]);
+        source.push(5);
+        assertEquals(cached.toArray(), [0, 1, 3, 4]);
+        assertEquals(generator.toArray(), [0, 1, 3, 4, 5]);
     }
 });
