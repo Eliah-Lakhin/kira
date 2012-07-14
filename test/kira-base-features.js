@@ -23,5 +23,37 @@ TestCase("Kira base features", {
         var reference = Kira.noConflict();
         assertUndefined(Kira);
         assertNotUndefined(reference);
+        Kira = reference;
+    },
+    "testTypeCheckers": function() {
+        assertTrue(Kira.isArray([1, 2, 3]));
+        assertFalse(Kira.isArray("String"));
+
+        assertTrue(Kira.isObject({hello: "world"}));
+        assertFalse(Kira.isObject(123));
+
+        (function() {
+            assertTrue(Kira.isArguments(arguments));
+        })(1, 2, 3);
+        assertFalse(Kira.isArguments([1, 2, 3]));
+
+        assertTrue(Kira.isString("hello world"));
+        assertFalse(Kira.isString(100500));
+
+        assertTrue(Kira.isNumber(100.5));
+        assertFalse(Kira.isNumber("hello world"));
+
+        assertTrue(Kira.isDate(new Date()));
+        assertFalse(Kira.isDate("hello world"));
+
+        assertTrue(Kira.isRegExp(/(.*)/img));
+        assertFalse(Kira.isRegExp("(.*)"));
+    },
+    "testEmptyGenerator": function() {
+        for (var iterator = Kira.emptyGenerator.iterator(), element = iterator.next();
+             element !== undefined;
+             element = iterator.next()) {
+            assertUndefined(element);
+        }
     }
 });
