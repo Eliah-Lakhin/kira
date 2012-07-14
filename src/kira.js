@@ -204,7 +204,7 @@
                         return array[index++];
                     }
                 }
-            }
+            };
         });
     };
 
@@ -218,7 +218,7 @@
                         return functor(sourceElement);
                     }
                 }
-            }
+            };
         });
     };
 
@@ -238,7 +238,7 @@
                         }
                         return sourceElement;
                     }
-                }
+                };
             } else {
                 return generator.iterator();
             }
@@ -267,7 +267,7 @@
                     }
                     return subElement;
                 }
-            }
+            };
         });
     };
 
@@ -281,7 +281,7 @@
                     } while (sourceElement !== undefined && !predicate(sourceElement));
                     return sourceElement;
                 }
-            }
+            };
         });
     };
 
@@ -297,7 +297,7 @@
                         return [leftElement, rightElement];
                     }
                 }
-            }
+            };
         });
     };
 
@@ -317,7 +317,7 @@
                     }
                     return iterator.next();
                 }
-            }
+            };
         });
     };
 
@@ -338,7 +338,7 @@
                     }
                     return iterator.next();
                 }
-            }
+            };
         });
     };
 
@@ -352,7 +352,7 @@
                         return iterator.next();
                     }
                 }
-            }
+            };
         });
     };
 
@@ -369,7 +369,7 @@
                         }
                     }
                 }
-            }
+            };
         });
     };
 
@@ -391,7 +391,7 @@
                         return rightIterator.next();
                     }
                 }
-            }
+            };
         });
     };
 
