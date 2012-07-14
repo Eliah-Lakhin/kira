@@ -17,7 +17,13 @@
 (function() {
     var context = this;
     var conflicted = this.Kira;
-    var Kira = {};
+    var Kira = function(source) {
+        if (Kira.isArray(source)) {
+            return Kira.arrayGenerator(source);
+        } else if (Kira.isFunction(source)) {
+            return new Kira.Generator(source);
+        }
+    };
 
     Kira.noConflict = function() {
         context.Kira = conflicted;
@@ -101,7 +107,7 @@
         return "Generator(" + (this.iterator !== undefined ? this.iterator : "") + ")";
     };
 
-    Kira.emptyGenerator = new Kira.Generator();
+    Kira.empty = new Kira.Generator();
 
     Kira.arrayGenerator = function(array) {
         return new Kira.Generator(function() {

@@ -50,7 +50,7 @@ TestCase("Kira base features", {
         assertFalse(Kira.isRegExp("(.*)"));
     },
     "testEmptyGenerator": function() {
-        for (var iterator = Kira.emptyGenerator.iterator(), element = iterator.next();
+        for (var iterator = Kira.empty.iterator(), element = iterator.next();
              element !== undefined;
              element = iterator.next()) {
             assertUndefined(element);
@@ -98,5 +98,8 @@ TestCase("Kira base features", {
 
         // concatenate
         assertEquals(Kira.arrayGenerator([0, 1]).concatenate(Kira.arrayGenerator([2, 3])).toArray(), [0, 1, 2, 3]);
+    },
+    "testShortConstructor": function() {
+        assertEquals(Kira.arrayGenerator([0, 1, 3, 4]).toArray(), Kira([0, 1, 3, 4]).toArray());
     }
 });
