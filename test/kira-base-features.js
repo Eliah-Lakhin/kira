@@ -55,5 +55,15 @@ TestCase("Kira base features", {
              element = iterator.next()) {
             assertUndefined(element);
         }
+    },
+    "testArrayGenerator": function() {
+        var array = [1, 2, 3];
+        var generator = Kira.arrayGenerator(array);
+        var index = 0;
+        for (var iterator = generator.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
+            assertNotUndefined(array[index]);
+            assertEquals(array[index], element);
+            index++;
+        }
     }
 });

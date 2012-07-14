@@ -59,5 +59,19 @@
 
     Kira.emptyGenerator = new Kira.Generator();
 
+    Kira.arrayGenerator = function(array) {
+        return new Kira.Generator(function() {
+            var length = array.length;
+            var index = 0;
+            return {
+                next: function() {
+                    if (index < length) {
+                        return array[index++];
+                    }
+                }
+            }
+        });
+    };
+
     context.Kira = Kira;
 })();
