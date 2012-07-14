@@ -111,6 +111,79 @@
         }
     };
 
+    Kira.Generator.prototype.all = function(predicate) {
+        for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
+            if (!predicate(element)) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    Kira.Generator.prototype.any = function(predicate) {
+        for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
+            if (predicate(element)) {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    Kira.Generator.prototype.fold = function(init, folder) {
+        for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
+            init = folder(element, init);
+        }
+        return init;
+    };
+
+    Kira.Generator.prototype.reduce = function(folder) {
+        var iterator = this.iterator();
+        var result = iterator.next();
+        if (result === undefined) {
+            return [];
+        }
+        while (true) {
+            var element = iterator.next();
+            if (element === undefined) {
+                break;
+            } else {
+                result = folder(element, result);
+            }
+        }
+        return [result];
+    };
+
+    Kira.Generator.prototype.find = function(predicate) {
+        for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
+            if (predicate(element)) {
+                return [element];
+            }
+        }
+        return [];
+    };
+
+    Kira.Generator.prototype.index = function(predicate) {
+        var index = 0;
+        for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
+            if (predicate(element)) {
+                return [index];
+            }
+            index++;
+        }
+        return [];
+    };
+
+    Kira.Generator.prototype.get = function(index) {
+        var currentIndex = 0;
+        for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
+            if (currentIndex === index) {
+                return [element];
+            }
+            currentIndex++;
+        }
+        return [];
+    };
+
     Kira.Generator.prototype.toString = function() {
         return "Generator(" + (this.iterator !== undefined ? this.iterator : "") + ")";
     };

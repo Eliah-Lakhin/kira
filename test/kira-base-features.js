@@ -111,5 +111,33 @@ TestCase("Kira base features", {
             }
         });
         assertEquals(result, [0, 1, 3, 4]);
+    },
+    "testGeneratorsEagerTransformations": function() {
+        // all
+        assertTrue(Kira([0, 1, 3, 4]).all(function(value) {return value < 5;}));
+        assertFalse(Kira([0, 1, 3, 40]).all(function(value) {return value < 5;}));
+
+        // any
+        assertTrue(Kira([0, 1, 3, 4]).any(function(value) {return value > 2;}));
+        assertFalse(Kira([0, 1, 3, 4]).any(function(value) {return value < -10;}));
+
+        // fold
+        assertEquals(Kira([0, 1, 3, 4]).fold(10, function(value, result) {return value + result;}), 18);
+
+        // reduce
+        assertEquals(Kira([0, 1, 3, 4]).reduce(function(value, result) {return value + result;}), [8]);
+        assertEquals(Kira.empty.reduce(function(value, result) {return value + result;}), []);
+
+        // find
+        assertEquals(Kira([0, 1, 3, 4]).find(function(value) {return value > 1;}), [3]);
+        assertEquals(Kira([0, 1, 3, 4]).find(function(value) {return value > 10;}), []);
+
+        // index
+        assertEquals(Kira([0, 1, 3, 4]).index(function(value) {return value > 1;}), [2]);
+        assertEquals(Kira([0, 1, 3, 4]).index(function(value) {return value > 10;}), []);
+
+        // get
+        assertEquals(Kira([0, 1, 3, 4]).get(3), [4]);
+        assertEquals(Kira([0, 1, 3, 4]).get(5), []);
     }
 });
