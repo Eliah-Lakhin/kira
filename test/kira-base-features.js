@@ -65,5 +65,38 @@ TestCase("Kira base features", {
             assertEquals(array[index], element);
             index++;
         }
+    },
+    "testGeneratorToArray": function() {
+        assertArray(Kira.arrayGenerator([0, 1, 2, 3]).drop(1).toArray());
+    },
+    "testGeneratorsLazyTransformations": function() {
+        // map
+        assertEquals(Kira.arrayGenerator([0, 1, 2]).map(function(value) {return value * 2;}).toArray(), [0, 2, 4]);
+
+        // flat
+        assertEquals(Kira.arrayGenerator([0, 1, 2, 3]).flat(function(value) {
+            return value < 2 ? Kira.arrayGenerator([value, value]) : Kira.arrayGenerator([value * 2]);
+        }).toArray(), [0, 0, 1, 1, 4, 6]);
+        assertEquals(Kira.arrayGenerator([0, 1, 2, 3]).flat(function(value) {
+            return value % 2 == 0 ? Kira.arrayGenerator([]) : Kira.arrayGenerator([value, value]);
+        }).toArray(), [1, 1, 3, 3]);
+
+        // filter
+        assertEquals(Kira.arrayGenerator([0, 1, 2, 3, 4]).filter(function(value) {return value % 2 == 0;}).toArray(), [0, 2, 4]);
+
+        // zip
+        assertEquals(Kira.arrayGenerator([0, 1, 2]).zip(Kira.arrayGenerator(["zero", "one", "two"])).toArray(),
+            [[0, "zero"], [1, "one"], [2, "two"]]);
+
+        // drop
+        assertEquals(Kira.arrayGenerator([0, 1, 2, 3, 4]).drop(1).toArray(), [1, 2, 3, 4]);
+        assertEquals(Kira.arrayGenerator([0, 1, 2, 3, 4]).dropWhile(function(value) {return value < 2;}).toArray(), [2, 3, 4]);
+
+        // take
+        assertEquals(Kira.arrayGenerator([0, 1, 2, 3, 4]).take(3).toArray(), [0, 1, 2]);
+        assertEquals(Kira.arrayGenerator([0, 1, 2, 3, 4]).takeWhile(function(value) {return value < 2;}).toArray(), [0, 1]);
+
+        // concatenate
+        assertEquals(Kira.arrayGenerator([0, 1]).concatenate(Kira.arrayGenerator([2, 3])).toArray(), [0, 1, 2, 3]);
     }
 });

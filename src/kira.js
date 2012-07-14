@@ -53,8 +53,52 @@
         };
     };
 
+    Kira.Generator.prototype.toArray = function() {
+        var result = [];
+        for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
+            result.push(element);
+        }
+        return result;
+    };
+
+    Kira.Generator.prototype.map = function(functor) {
+        return Kira.mappedGenerator(this, functor);
+    };
+
+    Kira.Generator.prototype.flat = function(functor) {
+        return Kira.flatMappedGenerator(this, functor);
+    };
+
+    Kira.Generator.prototype.filter = function(predicate) {
+        return Kira.filteredGenerator(this, predicate);
+    };
+
+    Kira.Generator.prototype.zip = function(right) {
+        return Kira.zippedGenerator(this, right);
+    };
+
+    Kira.Generator.prototype.drop = function(count) {
+        return Kira.droppedGenerator(this, count);
+    };
+
+    Kira.Generator.prototype.dropWhile = function(predicate) {
+        return Kira.conditionalDroppedGenerator(this, predicate);
+    };
+
+    Kira.Generator.prototype.take = function(count) {
+        return Kira.tookGenerator(this, count);
+    };
+
+    Kira.Generator.prototype.takeWhile = function(predicate) {
+        return Kira.conditionalTookGenerator(this, predicate);
+    };
+
+    Kira.Generator.prototype.concatenate = function(right) {
+        return Kira.concatenatedGenerator(this, right);
+    };
+
     Kira.Generator.prototype.toString = function() {
-        return "Generator(" + (this._source !== undefined ? this._source : "") + ")";
+        return "Generator(" + (this.iterator !== undefined ? this.iterator : "") + ")";
     };
 
     Kira.emptyGenerator = new Kira.Generator();
@@ -67,6 +111,170 @@
                 next: function() {
                     if (index < length) {
                         return array[index++];
+                    }
+                }
+            }
+        });
+    };
+
+    Kira.mappedGenerator = function(source, functor) {
+        return new Kira.Generator(function() {
+            var sourceIterator = source.iterator();
+            return {
+                next: function() {
+                    var sourceElement = sourceIterator.next();
+                    if (sourceElement !== undefined) {
+                        return functor(sourceElement);
+                    }
+                }
+            }
+        });
+    };
+
+    Kira.flatMappedGenerator = function(source, functor) {
+        return new Kira.Generator(function() {
+            var sourceIterator = source.iterator();
+            var elementMapping;
+            var subElement;
+            return {
+                next: function() {
+                    if (subElement !== undefined) {
+                        subElement = elementMapping.next();
+                    }
+                    if (subElement === undefined) {
+                        do {
+                            var sourceElement = sourceIterator.next();
+                            if (sourceElement === undefined) {
+                                return;
+                            }
+                            elementMapping = functor(sourceElement).iterator();
+                            subElement = elementMapping.next();
+                        } while (subElement === undefined);
+                    }
+                    return subElement;
+                }
+            }
+        });
+    };
+
+    Kira.filteredGenerator = function(source, predicate) {
+        return new Kira.Generator(function() {
+            var sourceIterator = source.iterator();
+            return {
+                next: function() {
+                    do {
+                        var sourceElement = sourceIterator.next();
+                    } while (sourceElement !== undefined && !predicate(sourceElement));
+                    return sourceElement;
+                }
+            }
+        });
+    };
+
+    Kira.zippedGenerator = function(left, right) {
+        return new Kira.Generator(function() {
+            var leftIterator = left.iterator();
+            var rightIterator = right.iterator();
+            return {
+                next: function() {
+                    var leftElement = leftIterator.next();
+                    var rightElement = rightIterator.next();
+                    if (leftElement !== undefined && rightElement !== undefined) {
+                        return [leftElement, rightElement];
+                    }
+                }
+            }
+        });
+    };
+
+    Kira.droppedGenerator = function(source, count) {
+        return new Kira.Generator(function() {
+            var iterator = source.iterator();
+            var dropped = false;
+            return {
+                next: function() {
+                    if (!dropped) {
+                        dropped = true;
+                        for (var index = 0; index < count; index++) {
+                            if (iterator.next() === undefined) {
+                                return;
+                            }
+                        }
+                    }
+                    return iterator.next();
+                }
+            }
+        });
+    };
+
+    Kira.conditionalDroppedGenerator = function(source, predicate) {
+        return new Kira.Generator(function() {
+            var iterator = source.iterator();
+            var dropped = false;
+            return {
+                next: function() {
+                    while (!dropped) {
+                        var element = iterator.next();
+                        if (element === undefined) {
+                            return;
+                        }
+                        if (dropped = !predicate(element)) {
+                            return element;
+                        }
+                    }
+                    return iterator.next();
+                }
+            }
+        });
+    };
+
+    Kira.tookGenerator = function(source, count) {
+        return new Kira.Generator(function() {
+            var iterator = source.iterator();
+            var index = 0;
+            return {
+                next: function() {
+                    if (index++ < count) {
+                        return iterator.next();
+                    }
+                }
+            }
+        });
+    };
+
+    Kira.conditionalTookGenerator = function(source, predicate) {
+        return new Kira.Generator(function() {
+            var iterator = source.iterator();
+            var execution = true;
+            return {
+                next: function() {
+                    if (execution) {
+                        var element = iterator.next();
+                        if (element !== undefined && (execution = predicate(element))) {
+                            return element;
+                        }
+                    }
+                }
+            }
+        });
+    };
+
+    Kira.concatenatedGenerator = function(left, right) {
+        return new Kira.Generator(function() {
+            var leftIterator = left.iterator();
+            var rightIterator;
+            return {
+                next: function() {
+                    if (rightIterator === undefined) {
+                        var element = leftIterator.next();
+                        if (element === undefined) {
+                            rightIterator = right.iterator();
+                            return rightIterator.next();
+                        } else {
+                            return element;
+                        }
+                    } else {
+                        return rightIterator.next();
                     }
                 }
             }
