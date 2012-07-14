@@ -103,6 +103,14 @@
         return Kira.concatenatedGenerator(this, right);
     };
 
+    Kira.Generator.prototype.each = function(step) {
+        for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
+            if (step(element) === false) {
+                break;
+            }
+        }
+    };
+
     Kira.Generator.prototype.toString = function() {
         return "Generator(" + (this.iterator !== undefined ? this.iterator : "") + ")";
     };

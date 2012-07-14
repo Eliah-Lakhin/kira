@@ -101,5 +101,15 @@ TestCase("Kira base features", {
     },
     "testShortConstructor": function() {
         assertEquals(Kira.arrayGenerator([0, 1, 3, 4]).toArray(), Kira([0, 1, 3, 4]).toArray());
+    },
+    "testGeneratorForEach": function() {
+        var result = [];
+        Kira.arrayGenerator([0, 1, 3, 4, 5]).each(function(element) {
+            result.push(element);
+            if (element === 4) {
+                return false;
+            }
+        });
+        assertEquals(result, [0, 1, 3, 4]);
     }
 });
