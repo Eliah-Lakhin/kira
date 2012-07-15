@@ -99,6 +99,10 @@
         return Kira.conditionalDroppedGenerator(this, predicate);
     };
 
+    Kira.Generator.prototype.limit = function(min, max) {
+        return Kira.limitedGenerator(this, min, max);
+    };
+
     Kira.Generator.prototype.take = function(count) {
         return Kira.tookGenerator(this, count);
     };
@@ -399,6 +403,30 @@
         });
     };
 
+    Kira.limitedGenerator = function(source, min, max) {
+        return new Kira.Generator(function() {
+            var iterator = source.iterator();
+            var dropped = false;
+            var index;
+            return {
+                next: function() {
+                    if (!dropped) {
+                        dropped = true;
+                        index = -1;
+                        while (++index < min) {
+                            if (iterator.next() === undefined) {
+                                return;
+                            }
+                        }
+                    }
+                    if (index++ < max) {
+                        return iterator.next();
+                    }
+                }
+            };
+        });
+    };
+
     Kira.Range = function(left, right) {
         this._defined = left !== undefined && right !== undefined && left < right;
         if (this._defined) {
@@ -512,6 +540,32 @@
         } else {
             return this;
         }
+    };
+
+    Kira.Range.prototype.substring = function(string) {
+        return this._defined ? string.substring(this._left, this._right) : "";
+    };
+
+    Kira.Range.prototype.replaceString = function(source, replacement) {
+        return this._defined ? source.substring(0, this._left) + replacement + source.substring(this._right) : source;
+    };
+
+    Kira.Range.prototype.subarray = function(array) {
+        return this._defined ? array.slice(this._left, this._right) : [];
+    };
+
+    Kira.Range.prototype.replaceArray = function(source, replacement) {
+        var result = source.slice(0);
+        if (this._defined) {
+            var spliceArguments = replacement.slice(0);
+            spliceArguments.unshift(this._left, this._length);
+            result.splice.apply(result, spliceArguments);
+        }
+        return result;
+    };
+
+    Kira.Range.prototype.limit = function(generator) {
+        return this._defined ? Kira.limitedGenerator(generator, this._left, this._right) : Kira.empty;
     };
 
     context.Kira = Kira;

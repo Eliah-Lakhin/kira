@@ -215,5 +215,31 @@ TestCase("Kira base features", {
     "testRangeOption": function() {
         assertEquals(Kira(1, 3).toOption().length, 1);
         assertEquals(Kira(1, -3).toOption().length, 0);
+    },
+    "testByRangeTransformations": function() {
+        assertEquals(Kira(1, 5).substring("hello world"), "ello");
+        assertEquals(Kira(1, 100).substring("hello world"), "ello world");
+        assertEquals(Kira(-100, 100).substring("hello world"), "hello world");
+        assertEquals(Kira(50, 100).substring("hello world"), "");
+
+        assertEquals(Kira(1, 5).replaceString("hello world", "123"), "h123 world");
+        assertEquals(Kira(1, 100).replaceString("hello world", "123"), "h123");
+        assertEquals(Kira(-100, 100).replaceString("hello world", "123"), "123");
+        assertEquals(Kira(50, 100).replaceString("hello world", "123"), "hello world123");
+
+        assertEquals(Kira(2, 4).subarray([0, 1, 2, 3, 4, 5]), [2, 3]);
+        assertEquals(Kira(2, 100).subarray([0, 1, 2, 3, 4, 5]), [2, 3, 4, 5]);
+        assertEquals(Kira(-100, 100).subarray([0, 1, 2, 3, 4, 5]), [0, 1, 2, 3, 4, 5]);
+        assertEquals(Kira(50, 100).subarray([0, 1, 2, 3, 4, 5]), []);
+
+        assertEquals(Kira(2, 4).replaceArray([0, 1, 2, 3, 4, 5], ["a", "b"]), [0, 1, "a", "b", 4, 5]);
+        assertEquals(Kira(2, 100).replaceArray([0, 1, 2, 3, 4, 5], ["a", "b"]), [0, 1, "a", "b"]);
+        assertEquals(Kira(-100, 100).replaceArray([0, 1, 2, 3, 4, 5], ["a", "b"]), ["a", "b"]);
+        assertEquals(Kira(50, 100).replaceArray([0, 1, 2, 3, 4, 5], ["a", "b"]), [0, 1, 2, 3, 4, 5, "a", "b"]);
+
+        assertEquals(Kira(2, 4).limit(Kira([0, 1, 2, 3, 4, 5])).toArray(), [2, 3]);
+        assertEquals(Kira(2, 100).limit(Kira([0, 1, 2, 3, 4, 5])).toArray(), [2, 3, 4, 5]);
+        assertEquals(Kira(-100, 100).limit(Kira([0, 1, 2, 3, 4, 5])).toArray(), [0, 1, 2, 3, 4, 5]);
+        assertEquals(Kira(50, 100).limit(Kira([0, 1, 2, 3, 4, 5])).toArray(), []);
     }
 });
