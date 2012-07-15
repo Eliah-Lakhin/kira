@@ -26,6 +26,8 @@
             var left = Math.floor(source);
             var right = arguments[1] !== undefined && Kira.isNumber(arguments[1]) ? Math.ceil(arguments[1]) : left + 1;
             return new Kira.Range(left, right);
+        } else if (Kira.isObject(source)) {
+            return new Kira.createEntryGenerator(source);
         }
     };
 
@@ -382,6 +384,22 @@
                 next: function() {
                     if (index < length) {
                         return array[index++];
+                    }
+                }
+            };
+        });
+    };
+
+    Kira.createEntryGenerator = function(object) {
+        return new Kira.Generator(function() {
+            var keys = Kira.keys(object);
+            var length = keys.length;
+            var index = 0;
+            return {
+                next: function() {
+                    if (index < length) {
+                        var key = keys[index++];
+                        return [key, object[key]];
                     }
                 }
             };
