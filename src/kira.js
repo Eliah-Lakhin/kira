@@ -445,5 +445,66 @@
         return this._length;
     };
 
+    Kira.Range.prototype.map = function(leftMapper, rightMapper) {
+        if (this._defined) {
+            return new Kira.Range(leftMapper(this._left), rightMapper === undefined ? leftMapper(this._right) : rightMapper(this._right));
+        } else {
+            return this;
+        }
+    };
+
+    Kira.Range.prototype.unionWithPoint = function(point) {
+        point = Math.floor(point);
+        if (this._defined) {
+            return new Kira.Range(Math.min(point, this._left), Math.max(point + 1, this._right));
+        } else {
+            return new Kira.Range(point, point + 1);
+        }
+    };
+
+    Kira.Range.prototype.unionWithRange = function(another) {
+        if (this._defined && another._defined) {
+            return new Kira.Range(Math.min(this._left, another._left), Math.max(this._right, another._right));
+        } else if (this._defined) {
+            return this;
+        } else {
+            return another;
+        }
+    };
+
+    Kira.Range.prototype.inject = function(injection) {
+        if (this._defined && injection._defined) {
+            if (this._right <= injection._left) {
+                return new Kira.Range(this._left, injection._right);
+            } else if (injection._right <= this._left) {
+                return new Kira.Range(injection._left, this._right);
+            } else if (this._left <= injection._left) {
+                return new Kira.Range(this._left, this._right + injection._length);
+            } else {
+                return new Kira.Range(injection._left, injection._right + this._length);
+            }
+        } else if (this._defined) {
+            return this;
+        } else {
+            return _defined;
+        }
+    };
+
+    Kira.Range.prototype.enlarge = function(pair) {
+        if (this._defined) {
+            return new Kira.Range(this._left - pair[0], this._right + pair[1]);
+        } else {
+            return this;
+        }
+    };
+
+    Kira.Range.prototype.shift = function(offset) {
+        if (this._defined) {
+            return new Kira.Range(this._left + offset, this._right + offset);
+        } else {
+            return this;
+        }
+    };
+
     context.Kira = Kira;
 })();

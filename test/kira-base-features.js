@@ -86,7 +86,11 @@ TestCase("Kira base features", {
 
         // zip
         assertEquals(Kira.arrayGenerator([0, 1, 2]).zip(Kira.arrayGenerator(["zero", "one", "two"])).toArray(),
-            [[0, "zero"], [1, "one"], [2, "two"]]);
+            [
+                [0, "zero"],
+                [1, "one"],
+                [2, "two"]
+            ]);
 
         // drop
         assertEquals(Kira.arrayGenerator([0, 1, 2, 3, 4]).drop(1).toArray(), [1, 2, 3, 4]);
@@ -179,5 +183,33 @@ TestCase("Kira base features", {
         assertEquals(Kira.undefinedRange.getLeft(), 0);
         assertEquals(Kira.undefinedRange.getRight(), 0);
         assertEquals(Kira.undefinedRange.getLength(), 0);
+    },
+    "testRangeTransformers": function() {
+        assertEquals(Kira(1, 3).map(function(bound) {return bound * 2;}).toGenerator().toArray(), [2, 3, 4, 5]);
+        assertEquals(Kira(1, 3).map(
+            function(left) {return left + 3;},
+            function(right) {return right * 2;}
+        ).toGenerator().toArray(), [4, 5]);
+
+        assertEquals(Kira(1, 3).unionWithPoint(0).toGenerator().toArray(), [0, 1, 2]);
+        assertEquals(Kira(1, 3).unionWithPoint(1).toGenerator().toArray(), [1, 2]);
+        assertEquals(Kira(1, 3).unionWithPoint(3).toGenerator().toArray(), [1, 2, 3]);
+
+        assertEquals(Kira(1, 3).unionWithRange(Kira(2, 5)).toGenerator().toArray(), [1, 2, 3, 4]);
+        assertEquals(Kira(1, 3).unionWithRange(Kira(3, 5)).toGenerator().toArray(), [1, 2, 3, 4]);
+        assertEquals(Kira(1, 3).unionWithRange(Kira(4, 5)).toGenerator().toArray(), [1, 2, 3, 4]);
+        assertEquals(Kira(1, 3).unionWithRange(Kira(1, 2)).toGenerator().toArray(), [1, 2]);
+
+        assertEquals(Kira(1, 3).inject(Kira(1, 3)).getLength(), 4);
+        assertEquals(Kira(1, 3).inject(Kira(2, 4)).getLength(), 4);
+        assertEquals(Kira(1, 3).inject(Kira(0, 2)).getLength(), 4);
+        assertEquals(Kira(1, 3).inject(Kira(10, 20)).getLength(), 19);
+
+        assertEquals(Kira(1, 3).enlarge([1, 1]).toGenerator().toArray(), [0, 1, 2, 3]);
+        assertEquals(Kira(1, 3).enlarge([1, 2]).toGenerator().toArray(), [0, 1, 2, 3, 4]);
+        assertEquals(Kira(1, 3).enlarge([-1, -1]).toGenerator().toArray(), []);
+
+        assertEquals(Kira(1, 3).shift(2).toGenerator().toArray(), [3, 4]);
+        assertEquals(Kira(1, 3).shift(-2).toGenerator().toArray(), [-1, 0]);
     }
 });
