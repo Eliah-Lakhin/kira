@@ -412,6 +412,8 @@
         }
     };
 
+    Kira.undefinedRange = new Kira.Range();
+
     Kira.Range.prototype.toGenerator = function() {
         var range = this;
         return this._defined ? new Kira.Generator(function() {

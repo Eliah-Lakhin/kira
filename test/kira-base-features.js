@@ -174,5 +174,10 @@ TestCase("Kira base features", {
         assertEquals(Kira(5, 0).getLeft(), 0);
         assertEquals(Kira(5, 0).getRight(), 0);
         assertEquals(Kira(5, 0).getLength(), 0);
+
+        assertFalse(Kira.undefinedRange.isDefined());
+        assertEquals(Kira.undefinedRange.getLeft(), 0);
+        assertEquals(Kira.undefinedRange.getRight(), 0);
+        assertEquals(Kira.undefinedRange.getLength(), 0);
     }
 });
