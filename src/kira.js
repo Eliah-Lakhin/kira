@@ -19,7 +19,7 @@
     var conflicted = this.Kira;
     var Kira = function(source) {
         if (Kira.isArray(source)) {
-            return Kira.arrayGenerator(source);
+            return Kira.createArrayGenerator(source);
         } else if (Kira.isFunction(source)) {
             return new Kira.Generator(source);
         } else if (Kira.isNumber(source)) {
@@ -72,31 +72,31 @@
     };
 
     Kira.Generator.prototype.cache = function() {
-        return Kira.cachedGenerator(this);
+        return Kira.createCachedGenerator(this);
     };
 
     Kira.Generator.prototype.map = function(functor) {
-        return Kira.mappedGenerator(this, functor);
+        return Kira.createMappedGenerator(this, functor);
     };
 
     Kira.Generator.prototype.flat = function(functor) {
-        return Kira.flatMappedGenerator(this, functor);
+        return Kira.createFlatMappedGenerator(this, functor);
     };
 
     Kira.Generator.prototype.filter = function(predicate) {
-        return Kira.filteredGenerator(this, predicate);
+        return Kira.createFilteredGenerator(this, predicate);
     };
 
     Kira.Generator.prototype.zip = function(right) {
-        return Kira.zippedGenerator(this, right);
+        return Kira.createZippedGenerator(this, right);
     };
 
     Kira.Generator.prototype.drop = function(count) {
-        return Kira.droppedGenerator(this, count);
+        return Kira.createDroppedGenerator(this, count);
     };
 
     Kira.Generator.prototype.dropWhile = function(predicate) {
-        return Kira.conditionalDroppedGenerator(this, predicate);
+        return Kira.createConditionalDroppedGenerator(this, predicate);
     };
 
     Kira.Generator.prototype.limit = function(min, max) {
@@ -104,15 +104,15 @@
     };
 
     Kira.Generator.prototype.take = function(count) {
-        return Kira.tookGenerator(this, count);
+        return Kira.createTookGenerator(this, count);
     };
 
     Kira.Generator.prototype.takeWhile = function(predicate) {
-        return Kira.conditionalTookGenerator(this, predicate);
+        return Kira.createConditionalTookGenerator(this, predicate);
     };
 
     Kira.Generator.prototype.concatenate = function(right) {
-        return Kira.concatenatedGenerator(this, right);
+        return Kira.createConcatenatedGenerator(this, right);
     };
 
     Kira.Generator.prototype.each = function(step) {
@@ -202,7 +202,7 @@
 
     Kira.empty = new Kira.Generator();
 
-    Kira.arrayGenerator = function(array) {
+    Kira.createArrayGenerator = function(array) {
         return new Kira.Generator(function() {
             var length = array.length;
             var index = 0;
@@ -216,7 +216,7 @@
         });
     };
 
-    Kira.mappedGenerator = function(source, functor) {
+    Kira.createMappedGenerator = function(source, functor) {
         return new Kira.Generator(function() {
             var sourceIterator = source.iterator();
             return {
@@ -230,7 +230,7 @@
         });
     };
 
-    Kira.cachedGenerator = function(source) {
+    Kira.createCachedGenerator = function(source) {
         var generator;
         return new Kira.Generator(function() {
             if (generator === undefined) {
@@ -242,7 +242,7 @@
                         if (sourceElement !== undefined) {
                             cache.push(sourceElement);
                         } else {
-                            generator = Kira.arrayGenerator(cache);
+                            generator = Kira.createArrayGenerator(cache);
                         }
                         return sourceElement;
                     }
@@ -253,7 +253,7 @@
         });
     };
 
-    Kira.flatMappedGenerator = function(source, functor) {
+    Kira.createFlatMappedGenerator = function(source, functor) {
         return new Kira.Generator(function() {
             var sourceIterator = source.iterator();
             var elementMapping;
@@ -279,7 +279,7 @@
         });
     };
 
-    Kira.filteredGenerator = function(source, predicate) {
+    Kira.createFilteredGenerator = function(source, predicate) {
         return new Kira.Generator(function() {
             var sourceIterator = source.iterator();
             return {
@@ -293,7 +293,7 @@
         });
     };
 
-    Kira.zippedGenerator = function(left, right) {
+    Kira.createZippedGenerator = function(left, right) {
         return new Kira.Generator(function() {
             var leftIterator = left.iterator();
             var rightIterator = right.iterator();
@@ -309,7 +309,7 @@
         });
     };
 
-    Kira.droppedGenerator = function(source, count) {
+    Kira.createDroppedGenerator = function(source, count) {
         return new Kira.Generator(function() {
             var iterator = source.iterator();
             var dropped = false;
@@ -329,7 +329,7 @@
         });
     };
 
-    Kira.conditionalDroppedGenerator = function(source, predicate) {
+    Kira.createConditionalDroppedGenerator = function(source, predicate) {
         return new Kira.Generator(function() {
             var iterator = source.iterator();
             var dropped = false;
@@ -350,7 +350,7 @@
         });
     };
 
-    Kira.tookGenerator = function(source, count) {
+    Kira.createTookGenerator = function(source, count) {
         return new Kira.Generator(function() {
             var iterator = source.iterator();
             var index = 0;
@@ -364,7 +364,7 @@
         });
     };
 
-    Kira.conditionalTookGenerator = function(source, predicate) {
+    Kira.createConditionalTookGenerator = function(source, predicate) {
         return new Kira.Generator(function() {
             var iterator = source.iterator();
             var execution = true;
@@ -381,7 +381,7 @@
         });
     };
 
-    Kira.concatenatedGenerator = function(left, right) {
+    Kira.createConcatenatedGenerator = function(left, right) {
         return new Kira.Generator(function() {
             var leftIterator = left.iterator();
             var rightIterator;

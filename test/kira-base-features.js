@@ -58,7 +58,7 @@ TestCase("Kira base features", {
     },
     "testArrayGenerator": function() {
         var array = [1, 2, 3];
-        var generator = Kira.arrayGenerator(array);
+        var generator = Kira.createArrayGenerator(array);
         var index = 0;
         for (var iterator = generator.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
             assertNotUndefined(array[index]);
@@ -67,48 +67,44 @@ TestCase("Kira base features", {
         }
     },
     "testGeneratorToArray": function() {
-        assertArray(Kira.arrayGenerator([0, 1, 2, 3]).drop(1).toArray());
+        assertArray(Kira.createArrayGenerator([0, 1, 2, 3]).drop(1).toArray());
     },
     "testGeneratorsLazyTransformations": function() {
         // map
-        assertEquals(Kira.arrayGenerator([0, 1, 2]).map(function(value) {return value * 2;}).toArray(), [0, 2, 4]);
+        assertEquals(Kira.createArrayGenerator([0, 1, 2]).map(function(value) {return value * 2;}).toArray(), [0, 2, 4]);
 
         // flat
-        assertEquals(Kira.arrayGenerator([0, 1, 2, 3]).flat(function(value) {
-            return value < 2 ? Kira.arrayGenerator([value, value]) : Kira.arrayGenerator([value * 2]);
+        assertEquals(Kira.createArrayGenerator([0, 1, 2, 3]).flat(function(value) {
+            return value < 2 ? Kira.createArrayGenerator([value, value]) : Kira.createArrayGenerator([value * 2]);
         }).toArray(), [0, 0, 1, 1, 4, 6]);
-        assertEquals(Kira.arrayGenerator([0, 1, 2, 3]).flat(function(value) {
-            return value % 2 == 0 ? Kira.arrayGenerator([]) : Kira.arrayGenerator([value, value]);
+        assertEquals(Kira.createArrayGenerator([0, 1, 2, 3]).flat(function(value) {
+            return value % 2 == 0 ? Kira.createArrayGenerator([]) : Kira.createArrayGenerator([value, value]);
         }).toArray(), [1, 1, 3, 3]);
 
         // filter
-        assertEquals(Kira.arrayGenerator([0, 1, 2, 3, 4]).filter(function(value) {return value % 2 == 0;}).toArray(), [0, 2, 4]);
+        assertEquals(Kira.createArrayGenerator([0, 1, 2, 3, 4]).filter(function(value) {return value % 2 == 0;}).toArray(), [0, 2, 4]);
 
         // zip
-        assertEquals(Kira.arrayGenerator([0, 1, 2]).zip(Kira.arrayGenerator(["zero", "one", "two"])).toArray(),
-            [
-                [0, "zero"],
-                [1, "one"],
-                [2, "two"]
-            ]);
+        assertEquals(Kira.createArrayGenerator([0, 1, 2]).zip(Kira.createArrayGenerator(["zero", "one", "two"])).toArray(),
+            [[0, "zero"], [1, "one"], [2, "two"]]);
 
         // drop
-        assertEquals(Kira.arrayGenerator([0, 1, 2, 3, 4]).drop(1).toArray(), [1, 2, 3, 4]);
-        assertEquals(Kira.arrayGenerator([0, 1, 2, 3, 4]).dropWhile(function(value) {return value < 2;}).toArray(), [2, 3, 4]);
+        assertEquals(Kira.createArrayGenerator([0, 1, 2, 3, 4]).drop(1).toArray(), [1, 2, 3, 4]);
+        assertEquals(Kira.createArrayGenerator([0, 1, 2, 3, 4]).dropWhile(function(value) {return value < 2;}).toArray(), [2, 3, 4]);
 
         // take
-        assertEquals(Kira.arrayGenerator([0, 1, 2, 3, 4]).take(3).toArray(), [0, 1, 2]);
-        assertEquals(Kira.arrayGenerator([0, 1, 2, 3, 4]).takeWhile(function(value) {return value < 2;}).toArray(), [0, 1]);
+        assertEquals(Kira.createArrayGenerator([0, 1, 2, 3, 4]).take(3).toArray(), [0, 1, 2]);
+        assertEquals(Kira.createArrayGenerator([0, 1, 2, 3, 4]).takeWhile(function(value) {return value < 2;}).toArray(), [0, 1]);
 
         // concatenate
-        assertEquals(Kira.arrayGenerator([0, 1]).concatenate(Kira.arrayGenerator([2, 3])).toArray(), [0, 1, 2, 3]);
+        assertEquals(Kira.createArrayGenerator([0, 1]).concatenate(Kira.createArrayGenerator([2, 3])).toArray(), [0, 1, 2, 3]);
     },
     "testShortConstructor": function() {
-        assertEquals(Kira.arrayGenerator([0, 1, 3, 4]).toArray(), Kira([0, 1, 3, 4]).toArray());
+        assertEquals(Kira.createArrayGenerator([0, 1, 3, 4]).toArray(), Kira([0, 1, 3, 4]).toArray());
     },
     "testGeneratorForEach": function() {
         var result = [];
-        Kira.arrayGenerator([0, 1, 3, 4, 5]).each(function(element) {
+        Kira.createArrayGenerator([0, 1, 3, 4, 5]).each(function(element) {
             result.push(element);
             if (element === 4) {
                 return false;
