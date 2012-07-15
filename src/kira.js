@@ -22,6 +22,8 @@
             return Kira.createArrayGenerator(source);
         } else if (Kira.isFunction(source)) {
             return new Kira.Generator(source);
+        } else if (Kira.isObject(source)) {
+            return new Kira.createEntryGenerator(source);
         }
     };
 
@@ -46,6 +48,21 @@
             };
         })();
     }
+    var getOwnPropertyNames = Object.getOwnPropertyNames;
+
+    Kira.keys = function(object) {
+        if (getOwnPropertyNames !== undefined) {
+            return getOwnPropertyNames(object);
+        } else {
+            var result = [];
+            for (var property in object) {
+                if (object.hasOwnProperty(property)) {
+                    result.push(property);
+                }
+            }
+            return result;
+        }
+    };
 
     Kira.Generator = function(iterator) {
         if (iterator !== undefined) {
@@ -202,6 +219,22 @@
                 next: function() {
                     if (index < length) {
                         return array[index++];
+                    }
+                }
+            };
+        });
+    };
+
+    Kira.createEntryGenerator = function(object) {
+        return new Kira.Generator(function() {
+            var keys = Kira.keys(object);
+            var length = keys.length;
+            var index = 0;
+            return {
+                next: function() {
+                    if (index < length) {
+                        var key = keys[index++];
+                        return [key, object[key]];
                     }
                 }
             };

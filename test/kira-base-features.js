@@ -148,5 +148,8 @@ TestCase("Kira base features", {
         source.push(5);
         assertEquals(cached.toArray(), [0, 1, 3, 4]);
         assertEquals(generator.toArray(), [0, 1, 3, 4, 5]);
+    },
+    "testEntryGenerator": function() {
+        assertEquals(Kira({a: 1, b: 2, c: 3}).toArray().sort(), [["a", 1], ["b", 2], ["c", 3]]);
     }
 });
