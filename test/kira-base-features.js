@@ -86,7 +86,11 @@ TestCase("Kira base features", {
 
         // zip
         assertEquals(Kira.createArrayGenerator([0, 1, 2]).zip(Kira.createArrayGenerator(["zero", "one", "two"])).toArray(),
-            [[0, "zero"], [1, "one"], [2, "two"]]);
+            [
+                [0, "zero"],
+                [1, "one"],
+                [2, "two"]
+            ]);
 
         // drop
         assertEquals(Kira.createArrayGenerator([0, 1, 2, 3, 4]).drop(1).toArray(), [1, 2, 3, 4]);
@@ -125,8 +129,8 @@ TestCase("Kira base features", {
         assertEquals(Kira([0, 1, 3, 4]).fold(10, function(value, result) {return value + result;}), 18);
 
         // reduce
-        assertEquals(Kira([0, 1, 3, 4]).reduce(function(value, result) {return value + result;}), [8]);
-        assertEquals(Kira.empty.reduce(function(value, result) {return value + result;}), []);
+        assertEquals(Kira([0, 1, 3, 4]).reduce(function(result, value) {return value + result;}), [8]);
+        assertEquals(Kira.empty.reduce(function(result, value) {return value + result;}), []);
 
         // find
         assertEquals(Kira([0, 1, 3, 4]).find(function(value) {return value > 1;}), [3]);
@@ -239,6 +243,72 @@ TestCase("Kira base features", {
         assertEquals(Kira(50, 100).limit(Kira([0, 1, 2, 3, 4, 5])).toArray(), []);
     },
     "testIndexRange": function() {
-        assertEquals(Kira.indexRange.toGenerator().zip(Kira(["a", "b", "c"])).toArray(), [[0, "a"], [1, "b"], [2, "c"]]);
+        assertEquals(Kira.indexRange.toGenerator().zip(Kira(["a", "b", "c"])).toArray(), [
+            [0, "a"],
+            [1, "b"],
+            [2, "c"]
+        ]);
+    },
+    "testArrayTransformers": function() {
+        // map
+        assertEquals(Kira.map([1, 2, 3], function(value) {return value * 2;}), [2, 4, 6]);
+
+        // flat
+        assertEquals(Kira.flat([1, 2, 3], function(value) {return value % 2 == 0 ? [10] : [value, value * 2];}), [1, 2, 10, 3, 6]);
+
+        // filter
+        assertEquals(Kira.filter([1, 2, 3], function(value) {return value % 2 != 0;}), [1, 3]);
+
+        // zip
+        assertEquals(Kira.zip([1, 2, 3], ["a", "b"]), [
+            [1, "a"],
+            [2, "b"]
+        ]);
+
+        // each
+        var sum = 0;
+        Kira.each([1, 2, 3], function(value) {
+            sum += value;
+        });
+        assertEquals(sum, 6);
+
+        // all
+        assertTrue(Kira.all([1, 2, 3], function(value) {return value < 4;}));
+        assertFalse(Kira.all([1, 2, 3], function(value) {return value < 2;}));
+
+        // any
+        assertTrue(Kira.any([1, 2, 3], function(value) {return value === 2;}));
+        assertFalse(Kira.any([1, 2, 3], function(value) {return value === 4;}));
+
+        // reduce
+        assertEquals(Kira.reduce([1, 2, 3], function(result, value) {return result + value}), [6]);
+        assertEquals(Kira.reduce([], function(result, value) {return result + value}), []);
+
+        // fold
+        assertEquals(Kira.fold([1, 2, 3], 4, function(result, value) {return result + value}), 10);
+        assertEquals(Kira.fold([], 4, function(result, value) {return result + value}), 4);
+
+        // find
+        assertEquals(Kira.find([1, 2, 3], function(value) {return value > 1;}), [2]);
+        assertEquals(Kira.find([1, 2, 3], function(value) {return value > 10;}), []);
+
+        // indexOf
+        assertEquals(Kira.indexOf([1, 2, 3], 1), [0]);
+        assertEquals(Kira.indexOf([1, 2, 3], 5), []);
+
+        // get
+        assertEquals(Kira.get([1, 2, 3], 1), [2]);
+        assertEquals(Kira.get([1, 2, 3], 5), []);
+
+        // getOrElse
+        assertEquals(Kira.getOrElse([1, 2, 3], 1, 0), [2]);
+        assertEquals(Kira.getOrElse([1, 2, 3], 5, 0), [0]);
+
+        // getOrElseLazy
+        assertEquals(Kira.getOrElseLazy([1, 2, 3], 1, function() {return 0;}), [2]);
+        assertEquals(Kira.getOrElseLazy([1, 2, 3], 5, function() {return 0;}), [0]);
+
+        // keys
+        assertEquals(Kira.keys({a: 1, b: 2, c: 3}).length, 3);
     }
 });
