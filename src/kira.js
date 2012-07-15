@@ -442,6 +442,8 @@
 
     Kira.undefinedRange = new Kira.Range();
 
+    Kira.indexRange = new Kira.Range(0, 0x10000000);
+
     Kira.Range.prototype.toGenerator = function() {
         var range = this;
         return this._defined ? new Kira.Generator(function() {

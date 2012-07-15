@@ -241,5 +241,8 @@ TestCase("Kira base features", {
         assertEquals(Kira(2, 100).limit(Kira([0, 1, 2, 3, 4, 5])).toArray(), [2, 3, 4, 5]);
         assertEquals(Kira(-100, 100).limit(Kira([0, 1, 2, 3, 4, 5])).toArray(), [0, 1, 2, 3, 4, 5]);
         assertEquals(Kira(50, 100).limit(Kira([0, 1, 2, 3, 4, 5])).toArray(), []);
+    },
+    "testIndexRange": function() {
+        assertEquals(Kira.indexRange.toGenerator().zip(Kira(["a", "b", "c"])).toArray(), [[0, "a"], [1, "b"], [2, "c"]]);
     }
 });
