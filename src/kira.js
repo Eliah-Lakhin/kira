@@ -51,6 +51,178 @@
         })();
     }
 
+    var forEach = Array.prototype.forEach,
+        filter = Array.prototype.filter,
+        map = Array.prototype.map,
+        every = Array.prototype.every,
+        some = Array.prototype.some,
+        reduce = Array.prototype.reduce,
+        indexOf = Array.prototype.indexOf,
+        getOwnPropertyNames = Object.getOwnPropertyNames;
+
+    Kira.map = function(array, functor) {
+        if (array.map === map && map !== undefined) {
+            return array.map(functor);
+        }
+        var result = [];
+        for (var index = 0, length = array.length; index < length; index++) {
+            result.push(functor(array[index]));
+        }
+        return result;
+    };
+
+    Kira.flat = function(array, functor) {
+        var result = [];
+        for (var index = 0, length = array.length; index < length; index++) {
+            var subResult = functor(array[index]);
+            for (var subResultIndex = 0, subResultLength = subResult.length; subResultIndex < subResultLength; subResultIndex++) {
+                result.push(subResult[subResultIndex]);
+            }
+        }
+        return result;
+    };
+
+    Kira.filter = function(array, predicate) {
+        if (array.filter === filter && filter !== undefined) {
+            return array.filter(predicate);
+        }
+        var result = [];
+        for (var index = 0, length = array.length; index < length; index++) {
+            var element = array[index];
+            if (predicate(element)) {
+                result.push(element);
+            }
+        }
+        return result;
+    };
+
+    Kira.zip = function(left, right) {
+        var result = [];
+        for (var index = 0, length = Math.min(left.length, right.length); index < length; index++) {
+            result.push([left[index], right[index]]);
+        }
+        return result;
+    };
+
+    Kira.each = function(array, step) {
+        if (array.forEach === forEach && forEach !== undefined) {
+            return array.forEach(step);
+        }
+        for (var index = 0, length = array.length; index < length; index++) {
+            step(array[index]);
+        }
+    };
+
+    Kira.all = function(array, predicate) {
+        if (array.every === every && every !== undefined) {
+            return array.every(predicate);
+        }
+        for (var index = 0, length = array.length; index < length; index++) {
+            if (!predicate(array[index])) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    Kira.any = function(array, predicate) {
+        if (array.some === some && some !== undefined) {
+            return array.some(predicate);
+        }
+        for (var index = 0, length = array.length; index < length; index++) {
+            if (!predicate(array[index])) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    Kira.reduce = function(array, folder) {
+        if (array.reduce === reduce && reduce !== undefined) {
+            try {
+                return [array.reduce(folder)];
+            } catch (error) {
+                if (error.type === "reduce_no_initial") {
+                    return [];
+                } else {
+                    throw error;
+                }
+            }
+        }
+        var length = array.length;
+        if (length > 0) {
+            var result = array[0];
+            for (var index = 1; index < length; index++) {
+                result = folder(result, array[index]);
+            }
+            return [result];
+        } else {
+            return [];
+        }
+    };
+
+    Kira.fold = function(array, init, folder) {
+        if (array.reduce === reduce && reduce !== undefined) {
+            return array.reduce(folder, init);
+        }
+        for (var index = 0, length = array.length; index < length; index++) {
+            init = folder(init, array[index]);
+        }
+        return init;
+    };
+
+    Kira.find = function(array, predicate) {
+        var result;
+        return Kira.any(array, function(value) {
+            if (predicate(value)) {
+                result = value;
+                return true;
+            } else {
+                return false;
+            }
+        }) ? [result] : [];
+    };
+
+    Kira.indexOf = function(array, element) {
+        if (array.indexOf === indexOf && indexOf !== undefined) {
+            var result = array.indexOf(element);
+            return result >= 0 ? [result] : [];
+        } else {
+            for (var index = 0, length = array.length; index < length; index++) {
+                if (array[index] === element) {
+                    return [index];
+                }
+            }
+            return [];
+        }
+    };
+
+    Kira.get = function(array, index) {
+        return index < array.length && index >= 0 ? [array[index]] : [];
+    };
+
+    Kira.getOrElse = function(array, index, defaultValue) {
+        return index < array.length && index >= 0 ? array[index] : defaultValue;
+    };
+
+    Kira.getOrElseLazy = function(array, index, defaultValue) {
+        return index < array.length && index >= 0 ? array[index] : defaultValue();
+    };
+
+    Kira.keys = function(object) {
+        if (getOwnPropertyNames !== undefined) {
+            return getOwnPropertyNames(object);
+        } else {
+            var result = [];
+            for (var property in object) {
+                if (object.hasOwnProperty(property)) {
+                    result.push(property);
+                }
+            }
+            return result;
+        }
+    };
+
     Kira.Generator = function(iterator) {
         if (iterator !== undefined) {
             this.iterator = iterator;
@@ -159,7 +331,7 @@
             if (element === undefined) {
                 break;
             } else {
-                result = folder(element, result);
+                result = folder(result, element);
             }
         }
         return [result];
