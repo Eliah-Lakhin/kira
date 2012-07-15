@@ -148,5 +148,10 @@ TestCase("Kira base features", {
         source.push(5);
         assertEquals(cached.toArray(), [0, 1, 3, 4]);
         assertEquals(generator.toArray(), [0, 1, 3, 4, 5]);
+    },
+    "testRangeConstructor": function() {
+        assertEquals(Kira(10).toGenerator().toArray(), [10]);
+        assertEquals(Kira(0, 5).toGenerator().toArray(), [0, 1, 2, 3, 4]);
+        assertEquals(Kira(10, 0).toGenerator().toArray(), []);
     }
 });

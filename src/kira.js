@@ -22,6 +22,10 @@
             return Kira.arrayGenerator(source);
         } else if (Kira.isFunction(source)) {
             return new Kira.Generator(source);
+        } else if (Kira.isNumber(source)) {
+            var left = Math.floor(source);
+            var right = arguments[1] !== undefined && Kira.isNumber(arguments[1]) ? Math.ceil(arguments[1]) : left + 1;
+            return new Kira.Range(left, right);
         }
     };
 
@@ -393,6 +397,29 @@
                 }
             };
         });
+    };
+
+    Kira.Range = function(left, right) {
+        this._defined = left !== undefined && right !== undefined && left < right;
+        if (this._defined) {
+            this._left = left;
+            this._right = right;
+        }
+    };
+
+    Kira.Range.prototype.toGenerator = function() {
+        var range = this;
+        return this._defined ? new Kira.Generator(function() {
+            var cursor = range._left - 1;
+            return {
+                next: function() {
+                    cursor++;
+                    if (cursor < range._right) {
+                        return cursor;
+                    }
+                }
+            };
+        }) : Kira.empty;
     };
 
     context.Kira = Kira;
