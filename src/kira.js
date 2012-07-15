@@ -404,6 +404,11 @@
         if (this._defined) {
             this._left = left;
             this._right = right;
+            this._length = right - left;
+        } else {
+            this._left = 0;
+            this._right = 0;
+            this._length = 0;
         }
     };
 
@@ -420,6 +425,22 @@
                 }
             };
         }) : Kira.empty;
+    };
+
+    Kira.Range.prototype.isDefined = function() {
+        return this._defined;
+    };
+
+    Kira.Range.prototype.getLeft = function() {
+        return this._left;
+    };
+
+    Kira.Range.prototype.getRight = function() {
+        return this._right;
+    };
+
+    Kira.Range.prototype.getLength = function() {
+        return this._length;
     };
 
     context.Kira = Kira;

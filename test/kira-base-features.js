@@ -153,5 +153,26 @@ TestCase("Kira base features", {
         assertEquals(Kira(10).toGenerator().toArray(), [10]);
         assertEquals(Kira(0, 5).toGenerator().toArray(), [0, 1, 2, 3, 4]);
         assertEquals(Kira(10, 0).toGenerator().toArray(), []);
+    },
+    "testRangeProperties": function() {
+        assertTrue(Kira(10).isDefined());
+        assertEquals(Kira(10).getLeft(), 10);
+        assertEquals(Kira(10).getRight(), 11);
+        assertEquals(Kira(10).getLength(), 1);
+
+        assertTrue(Kira(5, 10).isDefined());
+        assertEquals(Kira(5, 10).getLeft(), 5);
+        assertEquals(Kira(5, 10).getRight(), 10);
+        assertEquals(Kira(5, 10).getLength(), 5);
+
+        assertTrue(Kira(0, 5).isDefined());
+        assertEquals(Kira(0, 5).getLeft(), 0);
+        assertEquals(Kira(0, 5).getRight(), 5);
+        assertEquals(Kira(0, 5).getLength(), 5);
+
+        assertFalse(Kira(5, 0).isDefined());
+        assertEquals(Kira(5, 0).getLeft(), 0);
+        assertEquals(Kira(5, 0).getRight(), 0);
+        assertEquals(Kira(5, 0).getLength(), 0);
     }
 });
