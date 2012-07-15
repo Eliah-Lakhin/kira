@@ -86,7 +86,11 @@ TestCase("Kira base features", {
 
         // zip
         assertEquals(Kira.arrayGenerator([0, 1, 2]).zip(Kira.arrayGenerator(["zero", "one", "two"])).toArray(),
-            [[0, "zero"], [1, "one"], [2, "two"]]);
+            [
+                [0, "zero"],
+                [1, "one"],
+                [2, "two"]
+            ]);
 
         // drop
         assertEquals(Kira.arrayGenerator([0, 1, 2, 3, 4]).drop(1).toArray(), [1, 2, 3, 4]);
@@ -148,5 +152,94 @@ TestCase("Kira base features", {
         source.push(5);
         assertEquals(cached.toArray(), [0, 1, 3, 4]);
         assertEquals(generator.toArray(), [0, 1, 3, 4, 5]);
+    },
+    "testRangeConstructor": function() {
+        assertEquals(Kira(10).toGenerator().toArray(), [10]);
+        assertEquals(Kira(0, 5).toGenerator().toArray(), [0, 1, 2, 3, 4]);
+        assertEquals(Kira(10, 0).toGenerator().toArray(), []);
+    },
+    "testRangeProperties": function() {
+        assertTrue(Kira(10).isDefined());
+        assertEquals(Kira(10).getLeft(), 10);
+        assertEquals(Kira(10).getRight(), 11);
+        assertEquals(Kira(10).getLength(), 1);
+
+        assertTrue(Kira(5, 10).isDefined());
+        assertEquals(Kira(5, 10).getLeft(), 5);
+        assertEquals(Kira(5, 10).getRight(), 10);
+        assertEquals(Kira(5, 10).getLength(), 5);
+
+        assertTrue(Kira(0, 5).isDefined());
+        assertEquals(Kira(0, 5).getLeft(), 0);
+        assertEquals(Kira(0, 5).getRight(), 5);
+        assertEquals(Kira(0, 5).getLength(), 5);
+
+        assertFalse(Kira(5, 0).isDefined());
+        assertEquals(Kira(5, 0).getLeft(), 0);
+        assertEquals(Kira(5, 0).getRight(), 0);
+        assertEquals(Kira(5, 0).getLength(), 0);
+
+        assertFalse(Kira.undefinedRange.isDefined());
+        assertEquals(Kira.undefinedRange.getLeft(), 0);
+        assertEquals(Kira.undefinedRange.getRight(), 0);
+        assertEquals(Kira.undefinedRange.getLength(), 0);
+    },
+    "testRangeTransformers": function() {
+        assertEquals(Kira(1, 3).map(function(bound) {return bound * 2;}).toGenerator().toArray(), [2, 3, 4, 5]);
+        assertEquals(Kira(1, 3).map(
+            function(left) {return left + 3;},
+            function(right) {return right * 2;}
+        ).toGenerator().toArray(), [4, 5]);
+
+        assertEquals(Kira(1, 3).unionWithPoint(0).toGenerator().toArray(), [0, 1, 2]);
+        assertEquals(Kira(1, 3).unionWithPoint(1).toGenerator().toArray(), [1, 2]);
+        assertEquals(Kira(1, 3).unionWithPoint(3).toGenerator().toArray(), [1, 2, 3]);
+
+        assertEquals(Kira(1, 3).unionWithRange(Kira(2, 5)).toGenerator().toArray(), [1, 2, 3, 4]);
+        assertEquals(Kira(1, 3).unionWithRange(Kira(3, 5)).toGenerator().toArray(), [1, 2, 3, 4]);
+        assertEquals(Kira(1, 3).unionWithRange(Kira(4, 5)).toGenerator().toArray(), [1, 2, 3, 4]);
+        assertEquals(Kira(1, 3).unionWithRange(Kira(1, 2)).toGenerator().toArray(), [1, 2]);
+
+        assertEquals(Kira(1, 3).inject(Kira(1, 3)).getLength(), 4);
+        assertEquals(Kira(1, 3).inject(Kira(2, 4)).getLength(), 4);
+        assertEquals(Kira(1, 3).inject(Kira(0, 2)).getLength(), 4);
+        assertEquals(Kira(1, 3).inject(Kira(10, 20)).getLength(), 19);
+
+        assertEquals(Kira(1, 3).enlarge([1, 1]).toGenerator().toArray(), [0, 1, 2, 3]);
+        assertEquals(Kira(1, 3).enlarge([1, 2]).toGenerator().toArray(), [0, 1, 2, 3, 4]);
+        assertEquals(Kira(1, 3).enlarge([-1, -1]).toGenerator().toArray(), []);
+
+        assertEquals(Kira(1, 3).shift(2).toGenerator().toArray(), [3, 4]);
+        assertEquals(Kira(1, 3).shift(-2).toGenerator().toArray(), [-1, 0]);
+    },
+    "testRangeOption": function() {
+        assertEquals(Kira(1, 3).toOption().length, 1);
+        assertEquals(Kira(1, -3).toOption().length, 0);
+    },
+    "testByRangeTransformations": function() {
+        assertEquals(Kira(1, 5).substring("hello world"), "ello");
+        assertEquals(Kira(1, 100).substring("hello world"), "ello world");
+        assertEquals(Kira(-100, 100).substring("hello world"), "hello world");
+        assertEquals(Kira(50, 100).substring("hello world"), "");
+
+        assertEquals(Kira(1, 5).replaceString("hello world", "123"), "h123 world");
+        assertEquals(Kira(1, 100).replaceString("hello world", "123"), "h123");
+        assertEquals(Kira(-100, 100).replaceString("hello world", "123"), "123");
+        assertEquals(Kira(50, 100).replaceString("hello world", "123"), "hello world123");
+
+        assertEquals(Kira(2, 4).subarray([0, 1, 2, 3, 4, 5]), [2, 3]);
+        assertEquals(Kira(2, 100).subarray([0, 1, 2, 3, 4, 5]), [2, 3, 4, 5]);
+        assertEquals(Kira(-100, 100).subarray([0, 1, 2, 3, 4, 5]), [0, 1, 2, 3, 4, 5]);
+        assertEquals(Kira(50, 100).subarray([0, 1, 2, 3, 4, 5]), []);
+
+        assertEquals(Kira(2, 4).replaceArray([0, 1, 2, 3, 4, 5], ["a", "b"]), [0, 1, "a", "b", 4, 5]);
+        assertEquals(Kira(2, 100).replaceArray([0, 1, 2, 3, 4, 5], ["a", "b"]), [0, 1, "a", "b"]);
+        assertEquals(Kira(-100, 100).replaceArray([0, 1, 2, 3, 4, 5], ["a", "b"]), ["a", "b"]);
+        assertEquals(Kira(50, 100).replaceArray([0, 1, 2, 3, 4, 5], ["a", "b"]), [0, 1, 2, 3, 4, 5, "a", "b"]);
+
+        assertEquals(Kira(2, 4).limit(Kira([0, 1, 2, 3, 4, 5])).toArray(), [2, 3]);
+        assertEquals(Kira(2, 100).limit(Kira([0, 1, 2, 3, 4, 5])).toArray(), [2, 3, 4, 5]);
+        assertEquals(Kira(-100, 100).limit(Kira([0, 1, 2, 3, 4, 5])).toArray(), [0, 1, 2, 3, 4, 5]);
+        assertEquals(Kira(50, 100).limit(Kira([0, 1, 2, 3, 4, 5])).toArray(), []);
     }
 });
