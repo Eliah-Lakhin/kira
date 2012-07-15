@@ -429,6 +429,14 @@
         }) : Kira.empty;
     };
 
+    Kira.Range.prototype.toOption = function() {
+        return this._defined ? [this] : [];
+    };
+
+    Kira.Range.prototype.toString = function() {
+        return this._defined ? "Range(" + this._left + ", " + this._right + ")" : "Range()";
+    };
+
     Kira.Range.prototype.isDefined = function() {
         return this._defined;
     };

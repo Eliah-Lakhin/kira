@@ -211,5 +211,9 @@ TestCase("Kira base features", {
 
         assertEquals(Kira(1, 3).shift(2).toGenerator().toArray(), [3, 4]);
         assertEquals(Kira(1, 3).shift(-2).toGenerator().toArray(), [-1, 0]);
+    },
+    "testRangeOption": function() {
+        assertEquals(Kira(1, 3).toOption().length, 1);
+        assertEquals(Kira(1, -3).toOption().length, 0);
     }
 });
