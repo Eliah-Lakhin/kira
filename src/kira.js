@@ -60,6 +60,15 @@
         indexOf = Array.prototype.indexOf,
         getOwnPropertyNames = Object.getOwnPropertyNames;
 
+    Kira.append = function(target, key, value) {
+        if (value === undefined) {
+            target.push(key);
+        } else {
+            target[key] = value;
+        }
+        return target;
+    };
+
     Kira.map = function(array, functor) {
         if (array.map === map && map !== undefined) {
             return array.map(functor);

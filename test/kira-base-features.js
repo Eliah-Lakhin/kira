@@ -310,5 +310,9 @@ TestCase("Kira base features", {
 
         // keys
         assertEquals(Kira.keys({a: 1, b: 2, c: 3}).length, 3);
+    },
+    "testMutators": function() {
+        assertEquals(Kira.append([1, 2, 3], 4), [1, 2, 3, 4]);
+        assertEquals(Kira.append({a: 1, b: 2, c: 3}, "d", 4), {a: 1, b: 2, c: 3, d: 4});
     }
 });
