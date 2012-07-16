@@ -301,12 +301,24 @@ TestCase("Kira base features", {
         assertEquals(Kira.get([1, 2, 3], 5), []);
 
         // getOrElse
-        assertEquals(Kira.getOrElse([1, 2, 3], 1, 0), [2]);
-        assertEquals(Kira.getOrElse([1, 2, 3], 5, 0), [0]);
+        assertEquals(Kira.getOrElse([1, 2, 3], 1, 0), 2);
+        assertEquals(Kira.getOrElse([1, 2, 3], 5, 0), 0);
 
         // getOrElseLazy
         assertEquals(Kira.getOrElseLazy([1, 2, 3], 1, function() {return 0;}), [2]);
         assertEquals(Kira.getOrElseLazy([1, 2, 3], 5, function() {return 0;}), [0]);
+
+        // orElse
+        assertEquals(Kira.orElse([1, 2, 3], 1, [0]), [2]);
+        assertEquals(Kira.orElse([1, 2, 3], 5, [0]), [0]);
+
+        // orElseLazy
+        assertEquals(Kira.orElseLazy([1, 2, 3], 1, function() {return [0];}), [2]);
+        assertEquals(Kira.orElseLazy([1, 2, 3], 5, function() {return [0];}), [0]);
+
+        // nullable
+        assertEquals(Kira.nullable(null), []);
+        assertEquals(Kira.nullable(123), [123]);
 
         // keys
         assertEquals(Kira.keys({a: 1, b: 2, c: 3}).length, 3);

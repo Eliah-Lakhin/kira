@@ -221,6 +221,20 @@
         return result === undefined ? defaultValue() : result;
     };
 
+    Kira.orElse = function(object, key, defaultValue) {
+        var result = object[key];
+        return result === undefined ? defaultValue : [result];
+    };
+
+    Kira.orElseLazy = function(object, key, defaultValue) {
+        var result = object[key];
+        return result === undefined ? defaultValue() : [result];
+    };
+
+    Kira.nullable = function(nullable) {
+        return nullable === null ? [] : [nullable];
+    };
+
     Kira.keys = function(object) {
         if (getOwnPropertyNames !== undefined) {
             return getOwnPropertyNames(object);
