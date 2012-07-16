@@ -206,16 +206,19 @@
         }
     };
 
-    Kira.get = function(array, index) {
-        return index < array.length && index >= 0 ? [array[index]] : [];
+    Kira.get = function(object, key) {
+        var result = object[key];
+        return result === undefined ? [] : [result];
     };
 
-    Kira.getOrElse = function(array, index, defaultValue) {
-        return index < array.length && index >= 0 ? array[index] : defaultValue;
+    Kira.getOrElse = function(object, key, defaultValue) {
+        var result = object[key];
+        return result === undefined ? defaultValue : result;
     };
 
-    Kira.getOrElseLazy = function(array, index, defaultValue) {
-        return index < array.length && index >= 0 ? array[index] : defaultValue();
+    Kira.getOrElseLazy = function(object, key, defaultValue) {
+        var result = object[key];
+        return result === undefined ? defaultValue() : result;
     };
 
     Kira.keys = function(object) {
