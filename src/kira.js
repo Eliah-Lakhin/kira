@@ -62,16 +62,14 @@
         indexOf = Array.prototype.indexOf,
         getOwnPropertyNames = Object.getOwnPropertyNames;
 
-    Kira.extend = function(source, newFields) {
+    Kira.extend = function() {
         var result = {};
-        for (var field in source) {
-            if (source.hasOwnProperty(field)) {
-                result[field] = source[field];
-            }
-        }
-        for (field in newFields) {
-            if (newFields.hasOwnProperty(field)) {
-                result[field] = newFields[field];
+        for (var argumentIndex = 0, argumentLength = arguments.length; argumentIndex < argumentLength; argumentIndex++) {
+            var source = arguments[argumentIndex];
+            for (var field in source) {
+                if (source.hasOwnProperty(field)) {
+                    result[field] = source[field];
+                }
             }
         }
         return result;
