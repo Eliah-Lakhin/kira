@@ -237,6 +237,14 @@
         return nullable === null || nullable === undefined ? [] : [nullable];
     };
 
+    Kira.toSet = function(array) {
+        var result = {};
+        for (var index = 0, length = array.length; index < length; index++) {
+            result[array[index]] = true;
+        }
+        return result;
+    };
+
     Kira.keys = function(object) {
         if (getOwnPropertyNames !== undefined) {
             return getOwnPropertyNames(object);
@@ -267,6 +275,14 @@
         var result = [];
         for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
             result.push(element);
+        }
+        return result;
+    };
+
+    Kira.Generator.prototype.toSet = function() {
+        var result = {};
+        for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
+            result[element] = true;
         }
         return result;
     };
