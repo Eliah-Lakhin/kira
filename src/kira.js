@@ -234,7 +234,7 @@
     };
 
     Kira.nullable = function(nullable) {
-        return nullable === null ? [] : [nullable];
+        return nullable === null || nullable === undefined ? [] : [nullable];
     };
 
     Kira.keys = function(object) {
