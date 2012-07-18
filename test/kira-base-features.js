@@ -249,7 +249,13 @@ TestCase("Kira base features", {
             [2, "c"]
         ]);
     },
-    "testArrayTransformers": function() {
+    "testObjectTransformers": function() {
+        // extend
+        assertEquals(Kira.extend({a: 1, b: 2}, {}), {a: 1, b: 2});
+        assertEquals(Kira.extend({a: 1, b: 2}, {c: 3}), {a: 1, b: 2, c: 3});
+        assertEquals(Kira.extend({a: 1, b: 2}, {b: 3, c: 3}), {a: 1, b: 3, c: 3});
+        assertEquals(Kira.extend({}, {b: 3, c: 4}), {b: 3, c: 4});
+
         // map
         assertEquals(Kira.map([1, 2, 3], function(value) {return value * 2;}), [2, 4, 6]);
 
@@ -324,7 +330,11 @@ TestCase("Kira base features", {
         assertEquals(Kira.keys({a: 1, b: 2, c: 3}).length, 3);
     },
     "testEntryGenerator": function() {
-        assertEquals(Kira({a: 1, b: 2, c: 3}).toArray().sort(), [["a", 1], ["b", 2], ["c", 3]]);
+        assertEquals(Kira({a: 1, b: 2, c: 3}).toArray().sort(), [
+            ["a", 1],
+            ["b", 2],
+            ["c", 3]
+        ]);
     },
     "testMutators": function() {
         assertEquals(Kira.append([1, 2, 3], 4), [1, 2, 3, 4]);
