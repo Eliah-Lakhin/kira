@@ -332,5 +332,6 @@ TestCase("Kira base features", {
     },
     "testSets": function() {
         assertEquals(Kira([1, 2, 3, 3, 4]).toSet(), {1: true, 2: true, 3: true, 4: true});
+        assertEquals(Kira.toSet([1, 2, 3, 3, 4]), {1: true, 2: true, 3: true, 4: true});
     }
 });
