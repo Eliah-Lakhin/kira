@@ -272,6 +272,25 @@
         }
     };
 
+    Kira.log = function(message) {
+        context.console.log(message);
+        return message;
+    };
+
+    Kira.profile = function(block) {
+        var start = new Date().getTime();
+        block();
+        return new Date().getTime() - start;
+    };
+
+    Kira.logProfile = function(message, block) {
+        if (block === undefined) {
+            block = message;
+            message = "%s";
+        }
+        context.console.log(message.replace("%s", Kira.profile(block)));
+    };
+
     Kira.Generator = function(iterator) {
         if (iterator !== undefined) {
             this.iterator = iterator;
