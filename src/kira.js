@@ -271,6 +271,14 @@
         return result;
     };
 
+    Kira.Generator.prototype.toSet = function() {
+        var result = {};
+        for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
+            result[element] = true;
+        }
+        return result;
+    };
+
     Kira.Generator.prototype.cache = function() {
         return Kira.createCachedGenerator(this);
     };
