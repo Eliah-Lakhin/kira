@@ -137,6 +137,20 @@
         }
     };
 
+    Kira.group = function(array, mapping) {
+        var result = {};
+        for (var index = 0, length = array.length; index < length; index++) {
+            var value = array[index];
+            var key = mapping(value);
+            if (result[key] === undefined) {
+                result[key] = [value];
+            } else {
+                result[key].push(value);
+            }
+        }
+        return result;
+    };
+
     Kira.all = function(array, predicate) {
         if (array.every === every && every !== undefined) {
             return array.every(predicate);

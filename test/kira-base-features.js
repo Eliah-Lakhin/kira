@@ -278,6 +278,9 @@ TestCase("Kira base features", {
         });
         assertEquals(sum, 6);
 
+        // group
+        assertEquals(Kira.group(["a", "bc", "d"], function(value) {return value.length;}), {1: ["a", "d"], 2: "bc"});
+
         // all
         assertTrue(Kira.all([1, 2, 3], function(value) {return value < 4;}));
         assertFalse(Kira.all([1, 2, 3], function(value) {return value < 2;}));
