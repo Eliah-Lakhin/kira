@@ -1,0 +1,23 @@
+{
+    "name": "Kira",
+    "version": "0.1.0",
+    "author": "Ilya Lakhin(Илья Александрович Лахин) <eliah.lakhin@gmail.com>",
+    "description": "a library for functional programming in JavaScript and working lazy evaluation data collections",
+    "contributors": [
+        {
+            "name": "Ilya Lakhin(Илья Александрович Лахин)",
+            "email": "eliah.lakhin@gmail.com"
+        }
+    ],
+    "main": "./build/kira",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Eliah-Lakhin/kira"
+    },
+    "keywords": [
+        "functional",
+        "lazy",
+        "collections"
+    ],
+    "license": "APL2"
+}
