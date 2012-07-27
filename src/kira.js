@@ -706,7 +706,7 @@
     };
 
     Kira.Range = function(left, right) {
-        this._defined = left !== undefined && right !== undefined && left < right;
+        this._defined = left !== undefined && right !== undefined && left <= right;
         if (this._defined) {
             this._left = left;
             this._right = right;
@@ -802,7 +802,7 @@
         } else if (this._defined) {
             return this;
         } else {
-            return _defined;
+            return injection;
         }
     };
 
