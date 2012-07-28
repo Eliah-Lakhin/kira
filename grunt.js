@@ -20,7 +20,18 @@ module.exports = function(grunt) {
         },
         concat: {
             sources: {
-                src: ["<banner>", "<file_strip_banner:src/kira.js>"],
+                src: ["<banner>",
+                    "<file_strip_banner:src/wrappers/intro.js>",
+                    "<file_strip_banner:src/base.js>",
+                    "<file_strip_banner:src/modules/conflict.js>",
+                    "<file_strip_banner:src/modules/typecheck.js>",
+                    "<file_strip_banner:src/modules/console.js>",
+                    "<file_strip_banner:src/modules/objects.js>",
+                    "<file_strip_banner:src/modules/arrays.js>",
+                    "<file_strip_banner:src/modules/options.js>",
+                    "<file_strip_banner:src/modules/generators.js>",
+                    "<file_strip_banner:src/modules/ranges.js>",
+                    "<file_strip_banner:src/wrappers/outro.js>"],
                 dest: "build/<%= pkg.name %>-<%= pkg.version %>.js"
             }
         },
@@ -32,7 +43,7 @@ module.exports = function(grunt) {
         },
         watch: {
             files: ["src/*.js", "test/*.js"],
-            tasks: "lint"
+            tasks: "build"
         },
         jstdServer: {
             port: 9876,
@@ -50,12 +61,13 @@ module.exports = function(grunt) {
                 noempty: true,
                 quotmark: "double",
                 regexp: true
-
             }
         }
     });
 
     grunt.loadTasks("misc/tasks");
 
-    grunt.registerTask("default", "lint watch");
+    grunt.registerTask("build", "lint concat min");
+
+    grunt.registerTask("default", "build watch");
 };
