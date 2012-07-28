@@ -32,7 +32,8 @@ module.exports = function(grunt) {
                     "<file_strip_banner:src/modules/generators.js>",
                     "<file_strip_banner:src/modules/ranges.js>",
                     "<file_strip_banner:src/wrappers/outro.js>"],
-                dest: "build/<%= pkg.name %>-<%= pkg.version %>.js"
+                dest: "build/<%= pkg.name %>-<%= pkg.version %>.js",
+                separator: "\n\n"
             }
         },
         min: {

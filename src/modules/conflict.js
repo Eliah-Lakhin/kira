@@ -14,13 +14,15 @@
  limitations under the License.
  */
 
-(function() {
-    var context = this;
+//////////////////////////////
+//         Conflict         //
+//////////////////////////////
+
     var conflicted = context.Kira;
+
     context.Kira = Kira;
 
     Kira.noConflict = function() {
         context.Kira = conflicted;
         return Kira;
     };
-})();

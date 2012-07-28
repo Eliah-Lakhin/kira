@@ -14,18 +14,21 @@
  limitations under the License.
  */
 
-(function() {
-    var forEach = Array.prototype.forEach,
-        filter = Array.prototype.filter,
-        map = Array.prototype.map,
-        every = Array.prototype.every,
-        some = Array.prototype.some,
-        reduce = Array.prototype.reduce,
-        indexOf = Array.prototype.indexOf;
+//////////////////////////////
+//          Arrays          //
+//////////////////////////////
+
+    var nativeForEach = Array.prototype.forEach,
+        nativeFilter = Array.prototype.filter,
+        nativeMap = Array.prototype.map,
+        nativeEvery = Array.prototype.every,
+        nativeSome = Array.prototype.some,
+        nativeReduce = Array.prototype.reduce,
+        nativeIndexOf = Array.prototype.indexOf;
 
     Kira.arrays = {
         map: function(array, functor) {
-            if (array.map === map && map !== undefined) {
+            if (array.map === nativeMap && nativeMap !== undefined) {
                 return array.map(functor);
             }
             var result = [];
@@ -47,7 +50,7 @@
         },
 
         filter: function(array, predicate) {
-            if (array.filter === filter && filter !== undefined) {
+            if (array.filter === nativeFilter && nativeFilter !== undefined) {
                 return array.filter(predicate);
             }
             var result = [];
@@ -69,7 +72,7 @@
         },
 
         each: function(array, step) {
-            if (array.forEach === forEach && forEach !== undefined) {
+            if (array.forEach === nativeForEach && nativeForEach !== undefined) {
                 return array.forEach(step);
             }
             for (var index = 0, length = array.length; index < length; index++) {
@@ -92,7 +95,7 @@
         },
 
         all: function(array, predicate) {
-            if (array.every === every && every !== undefined) {
+            if (array.every === nativeEvery && nativeEvery !== undefined) {
                 return array.every(predicate);
             }
             for (var index = 0, length = array.length; index < length; index++) {
@@ -104,7 +107,7 @@
         },
 
         any: function(array, predicate) {
-            if (array.some === some && some !== undefined) {
+            if (array.some === nativeSome && nativeSome !== undefined) {
                 return array.some(predicate);
             }
             for (var index = 0, length = array.length; index < length; index++) {
@@ -116,7 +119,7 @@
         },
 
         reduce: function(array, folder) {
-            if (array.reduce === reduce && reduce !== undefined) {
+            if (array.reduce === nativeReduce && nativeReduce !== undefined) {
                 try {
                     return [array.reduce(folder)];
                 } catch (error) {
@@ -140,7 +143,7 @@
         },
 
         fold: function(array, init, folder) {
-            if (array.reduce === reduce && reduce !== undefined) {
+            if (array.reduce === nativeReduce && nativeReduce !== undefined) {
                 return array.reduce(folder, init);
             }
             for (var index = 0, length = array.length; index < length; index++) {
@@ -162,7 +165,7 @@
         },
 
         indexOf: function(array, element) {
-            if (array.indexOf === indexOf && indexOf !== undefined) {
+            if (array.indexOf === nativeIndexOf && nativeIndexOf !== undefined) {
                 var result = array.indexOf(element);
                 return result >= 0 ? [result] : [];
             } else {
@@ -183,4 +186,3 @@
             return result;
         }
     };
-})();

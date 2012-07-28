@@ -14,8 +14,11 @@
  limitations under the License.
  */
 
-(function() {
-    var getOwnPropertyNames = Object.getOwnPropertyNames;
+//////////////////////////////
+//          Objects         //
+//////////////////////////////
+
+    var nativeGetOwnPropertyNames = Object.getOwnPropertyNames;
 
     Kira.objects = {
         extend: function() {
@@ -41,8 +44,8 @@
         },
 
         keys: function(object) {
-            if (getOwnPropertyNames !== undefined) {
-                return getOwnPropertyNames(object);
+            if (nativeGetOwnPropertyNames !== undefined) {
+                return nativeGetOwnPropertyNames(object);
             } else {
                 var result = [];
                 for (var property in object) {
@@ -54,4 +57,3 @@
             }
         }
     };
-})();

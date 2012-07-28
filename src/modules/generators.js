@@ -14,385 +14,389 @@
  limitations under the License.
  */
 
-Kira.Generator = function(source) {
-    if (source !== undefined) {
-        if (Kira.typecheck.isArray(source)) {
-            this.iterator = function() {
-                var length = source.length;
-                var index = 0;
-                return {
-                    next: function() {
-                        if (index < length) {
-                            return source[index++];
+//////////////////////////////
+//        Generators        //
+//////////////////////////////
+
+    Kira.Generator = function(source) {
+        if (source !== undefined) {
+            if (Kira.typecheck.isArray(source)) {
+                this.iterator = function() {
+                    var length = source.length;
+                    var index = 0;
+                    return {
+                        next: function() {
+                            if (index < length) {
+                                return source[index++];
+                            }
                         }
-                    }
+                    };
                 };
-            };
-        } else {
-            this.iterator = function() {
-                var keys = Kira.objects.keys(source);
-                var length = keys.length;
-                var index = 0;
-                return {
-                    next: function() {
-                        if (index < length) {
-                            var key = keys[index++];
-                            return [key, source[key]];
+            } else {
+                this.iterator = function() {
+                    var keys = Kira.objects.keys(source);
+                    var length = keys.length;
+                    var index = 0;
+                    return {
+                        next: function() {
+                            if (index < length) {
+                                var key = keys[index++];
+                                return [key, source[key]];
+                            }
                         }
-                    }
+                    };
                 };
-            };
+            }
         }
-    }
-};
-
-Kira.Generator.empty = new Kira.Generator();
-
-Kira.Generator.prototype.iterator = function() {
-    return {
-        next: function() {}
     };
-};
 
-Kira.Generator.prototype.cache = function() {
-    var source = this;
-    var cacheGenerator;
-    var result = new Kira.Generator();
-    result.iterator = function() {
-        if (cacheGenerator === undefined) {
-            var cache = [];
+    Kira.Generator.empty = new Kira.Generator();
+
+    Kira.Generator.prototype.iterator = function() {
+        return {
+            next: function() {}
+        };
+    };
+
+    Kira.Generator.prototype.cache = function() {
+        var source = this;
+        var cacheGenerator;
+        var result = new Kira.Generator();
+        result.iterator = function() {
+            if (cacheGenerator === undefined) {
+                var cache = [];
+                var sourceIterator = source.iterator();
+                return {
+                    next: function() {
+                        var sourceElement = sourceIterator.next();
+                        if (sourceElement !== undefined) {
+                            cache.push(sourceElement);
+                        } else {
+                            cacheGenerator = new Kira.Generator(cache);
+                        }
+                        return sourceElement;
+                    }
+                };
+            } else {
+                return cacheGenerator.iterator();
+            }
+        };
+        return result;
+    };
+
+    Kira.Generator.prototype.map = function(functor) {
+        var source = this;
+        var result = new Kira.Generator();
+        result.iterator = function() {
             var sourceIterator = source.iterator();
             return {
                 next: function() {
                     var sourceElement = sourceIterator.next();
                     if (sourceElement !== undefined) {
-                        cache.push(sourceElement);
-                    } else {
-                        cacheGenerator = new Kira.Generator(cache);
+                        return functor(sourceElement);
                     }
+                }
+            };
+        };
+        return result;
+    };
+
+    Kira.Generator.prototype.flat = function(functor) {
+        var source = this;
+        var result = new Kira.Generator();
+        result.iterator = function() {
+            var sourceIterator = source.iterator();
+            var elementMapping;
+            var subElement;
+            return {
+                next: function() {
+                    if (subElement !== undefined) {
+                        subElement = elementMapping.next();
+                    }
+                    if (subElement === undefined) {
+                        do {
+                            var sourceElement = sourceIterator.next();
+                            if (sourceElement === undefined) {
+                                return;
+                            }
+                            elementMapping = functor(sourceElement).iterator();
+                            subElement = elementMapping.next();
+                        } while (subElement === undefined);
+                    }
+                    return subElement;
+                }
+            };
+        };
+        return result;
+    };
+
+    Kira.Generator.prototype.filter = function(predicate) {
+        var source = this;
+        var result = new Kira.Generator();
+        result.iterator = function() {
+            var sourceIterator = source.iterator();
+            return {
+                next: function() {
+                    var sourceElement;
+                    do {
+                        sourceElement = sourceIterator.next();
+                    } while (sourceElement !== undefined && !predicate(sourceElement));
                     return sourceElement;
                 }
             };
-        } else {
-            return cacheGenerator.iterator();
-        }
-    };
-    return result;
-};
-
-Kira.Generator.prototype.map = function(functor) {
-    var source = this;
-    var result = new Kira.Generator();
-    result.iterator = function() {
-        var sourceIterator = source.iterator();
-        return {
-            next: function() {
-                var sourceElement = sourceIterator.next();
-                if (sourceElement !== undefined) {
-                    return functor(sourceElement);
-                }
-            }
         };
+        return result;
     };
-    return result;
-};
 
-Kira.Generator.prototype.flat = function(functor) {
-    var source = this;
-    var result = new Kira.Generator();
-    result.iterator = function() {
-        var sourceIterator = source.iterator();
-        var elementMapping;
-        var subElement;
-        return {
-            next: function() {
-                if (subElement !== undefined) {
-                    subElement = elementMapping.next();
+    Kira.Generator.prototype.zip = function(right) {
+        var left = this;
+        var result = new Kira.Generator();
+        result.iterator = function() {
+            var leftIterator = left.iterator();
+            var rightIterator = right.iterator();
+            return {
+                next: function() {
+                    var leftElement = leftIterator.next();
+                    var rightElement = rightIterator.next();
+                    if (leftElement !== undefined && rightElement !== undefined) {
+                        return [leftElement, rightElement];
+                    }
                 }
-                if (subElement === undefined) {
-                    do {
-                        var sourceElement = sourceIterator.next();
-                        if (sourceElement === undefined) {
-                            return;
-                        }
-                        elementMapping = functor(sourceElement).iterator();
-                        subElement = elementMapping.next();
-                    } while (subElement === undefined);
-                }
-                return subElement;
-            }
+            };
         };
+        return result;
     };
-    return result;
-};
 
-Kira.Generator.prototype.filter = function(predicate) {
-    var source = this;
-    var result = new Kira.Generator();
-    result.iterator = function() {
-        var sourceIterator = source.iterator();
-        return {
-            next: function() {
-                var sourceElement;
-                do {
-                    sourceElement = sourceIterator.next();
-                } while (sourceElement !== undefined && !predicate(sourceElement));
-                return sourceElement;
-            }
-        };
-    };
-    return result;
-};
-
-Kira.Generator.prototype.zip = function(right) {
-    var left = this;
-    var result = new Kira.Generator();
-    result.iterator = function() {
-        var leftIterator = left.iterator();
-        var rightIterator = right.iterator();
-        return {
-            next: function() {
-                var leftElement = leftIterator.next();
-                var rightElement = rightIterator.next();
-                if (leftElement !== undefined && rightElement !== undefined) {
-                    return [leftElement, rightElement];
-                }
-            }
-        };
-    };
-    return result;
-};
-
-Kira.Generator.prototype.drop = function(count) {
-    var source = this;
-    var result = new Kira.Generator();
-    result.iterator = function() {
-        var iterator = source.iterator();
-        var dropped = false;
-        return {
-            next: function() {
-                if (!dropped) {
-                    dropped = true;
-                    for (var index = 0; index < count; index++) {
-                        if (iterator.next() === undefined) {
-                            return;
+    Kira.Generator.prototype.drop = function(count) {
+        var source = this;
+        var result = new Kira.Generator();
+        result.iterator = function() {
+            var iterator = source.iterator();
+            var dropped = false;
+            return {
+                next: function() {
+                    if (!dropped) {
+                        dropped = true;
+                        for (var index = 0; index < count; index++) {
+                            if (iterator.next() === undefined) {
+                                return;
+                            }
                         }
                     }
-                }
-                return iterator.next();
-            }
-        };
-    };
-    return result;
-};
-
-Kira.Generator.prototype.dropWhile = function(predicate) {
-    var source = this;
-    var result = new Kira.Generator();
-    result.iterator = function() {
-        var iterator = source.iterator();
-        var dropped = false;
-        return {
-            next: function() {
-                while (!dropped) {
-                    var element = iterator.next();
-                    if (element === undefined) {
-                        return;
-                    }
-                    dropped = !predicate(element);
-                    if (dropped) {
-                        return element;
-                    }
-                }
-                return iterator.next();
-            }
-        };
-    };
-    return result;
-};
-
-Kira.Generator.prototype.limit = function(min, max) {
-    var source = this;
-    var result = new Kira.Generator();
-    result.iterator = function() {
-        var iterator = source.iterator();
-        var dropped = false;
-        var index;
-        return {
-            next: function() {
-                if (!dropped) {
-                    dropped = true;
-                    index = -1;
-                    while (++index < min) {
-                        if (iterator.next() === undefined) {
-                            return;
-                        }
-                    }
-                }
-                if (index++ < max) {
                     return iterator.next();
                 }
-            }
+            };
         };
+        return result;
     };
-    return result;
-};
 
-Kira.Generator.prototype.take = function(count) {
-    var source = this;
-    var result = new Kira.Generator();
-    result.iterator = function() {
-        var iterator = source.iterator();
-        var index = 0;
-        return {
-            next: function() {
-                if (index++ < count) {
+    Kira.Generator.prototype.dropWhile = function(predicate) {
+        var source = this;
+        var result = new Kira.Generator();
+        result.iterator = function() {
+            var iterator = source.iterator();
+            var dropped = false;
+            return {
+                next: function() {
+                    while (!dropped) {
+                        var element = iterator.next();
+                        if (element === undefined) {
+                            return;
+                        }
+                        dropped = !predicate(element);
+                        if (dropped) {
+                            return element;
+                        }
+                    }
                     return iterator.next();
                 }
-            }
+            };
         };
+        return result;
     };
-    return result;
-};
 
-Kira.Generator.prototype.takeWhile = function(predicate) {
-    var source = this;
-    var result = new Kira.Generator();
-    result.iterator = function() {
-        var iterator = source.iterator();
-        var execution = true;
-        return {
-            next: function() {
-                if (execution) {
-                    var element = iterator.next();
-                    if (element !== undefined && (execution = predicate(element))) {
-                        return element;
+    Kira.Generator.prototype.limit = function(min, max) {
+        var source = this;
+        var result = new Kira.Generator();
+        result.iterator = function() {
+            var iterator = source.iterator();
+            var dropped = false;
+            var index;
+            return {
+                next: function() {
+                    if (!dropped) {
+                        dropped = true;
+                        index = -1;
+                        while (++index < min) {
+                            if (iterator.next() === undefined) {
+                                return;
+                            }
+                        }
+                    }
+                    if (index++ < max) {
+                        return iterator.next();
                     }
                 }
-            }
+            };
         };
+        return result;
     };
-    return result;
-};
 
-Kira.Generator.prototype.concatenate = function(right) {
-    var left = this;
-    var result = new Kira.Generator();
-    result.iterator = function() {
-        var leftIterator = left.iterator();
-        var rightIterator;
-        return {
-            next: function() {
-                if (rightIterator === undefined) {
-                    var element = leftIterator.next();
-                    if (element === undefined) {
-                        rightIterator = right.iterator();
-                        return rightIterator.next();
+    Kira.Generator.prototype.take = function(count) {
+        var source = this;
+        var result = new Kira.Generator();
+        result.iterator = function() {
+            var iterator = source.iterator();
+            var index = 0;
+            return {
+                next: function() {
+                    if (index++ < count) {
+                        return iterator.next();
+                    }
+                }
+            };
+        };
+        return result;
+    };
+
+    Kira.Generator.prototype.takeWhile = function(predicate) {
+        var source = this;
+        var result = new Kira.Generator();
+        result.iterator = function() {
+            var iterator = source.iterator();
+            var execution = true;
+            return {
+                next: function() {
+                    if (execution) {
+                        var element = iterator.next();
+                        if (element !== undefined && (execution = predicate(element))) {
+                            return element;
+                        }
+                    }
+                }
+            };
+        };
+        return result;
+    };
+
+    Kira.Generator.prototype.concatenate = function(right) {
+        var left = this;
+        var result = new Kira.Generator();
+        result.iterator = function() {
+            var leftIterator = left.iterator();
+            var rightIterator;
+            return {
+                next: function() {
+                    if (rightIterator === undefined) {
+                        var element = leftIterator.next();
+                        if (element === undefined) {
+                            rightIterator = right.iterator();
+                            return rightIterator.next();
+                        } else {
+                            return element;
+                        }
                     } else {
-                        return element;
+                        return rightIterator.next();
                     }
-                } else {
-                    return rightIterator.next();
                 }
-            }
+            };
         };
+        return result;
     };
-    return result;
-};
 
-Kira.Generator.prototype.each = function(step) {
-    for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
-        if (step(element) === false) {
-            break;
+    Kira.Generator.prototype.each = function(step) {
+        for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
+            if (step(element) === false) {
+                break;
+            }
         }
-    }
-};
+    };
 
-Kira.Generator.prototype.all = function(predicate) {
-    for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
-        if (!predicate(element)) {
-            return false;
+    Kira.Generator.prototype.all = function(predicate) {
+        for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
+            if (!predicate(element)) {
+                return false;
+            }
         }
-    }
-    return true;
-};
+        return true;
+    };
 
-Kira.Generator.prototype.any = function(predicate) {
-    for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
-        if (predicate(element)) {
-            return true;
+    Kira.Generator.prototype.any = function(predicate) {
+        for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
+            if (predicate(element)) {
+                return true;
+            }
         }
-    }
-    return false;
-};
+        return false;
+    };
 
-Kira.Generator.prototype.fold = function(init, folder) {
-    for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
-        init = folder(element, init);
-    }
-    return init;
-};
+    Kira.Generator.prototype.fold = function(init, folder) {
+        for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
+            init = folder(element, init);
+        }
+        return init;
+    };
 
-Kira.Generator.prototype.reduce = function(folder) {
-    var iterator = this.iterator();
-    var result = iterator.next();
-    if (result === undefined) {
+    Kira.Generator.prototype.reduce = function(folder) {
+        var iterator = this.iterator();
+        var result = iterator.next();
+        if (result === undefined) {
+            return [];
+        }
+        while (true) {
+            var element = iterator.next();
+            if (element === undefined) {
+                break;
+            } else {
+                result = folder(result, element);
+            }
+        }
+        return [result];
+    };
+
+    Kira.Generator.prototype.find = function(predicate) {
+        for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
+            if (predicate(element)) {
+                return [element];
+            }
+        }
         return [];
-    }
-    while (true) {
-        var element = iterator.next();
-        if (element === undefined) {
-            break;
-        } else {
-            result = folder(result, element);
+    };
+
+    Kira.Generator.prototype.index = function(predicate) {
+        var index = 0;
+        for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
+            if (predicate(element)) {
+                return [index];
+            }
+            index++;
         }
-    }
-    return [result];
-};
+        return [];
+    };
 
-Kira.Generator.prototype.find = function(predicate) {
-    for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
-        if (predicate(element)) {
-            return [element];
+    Kira.Generator.prototype.get = function(index) {
+        var currentIndex = 0;
+        for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
+            if (currentIndex === index) {
+                return [element];
+            }
+            currentIndex++;
         }
-    }
-    return [];
-};
+        return [];
+    };
 
-Kira.Generator.prototype.index = function(predicate) {
-    var index = 0;
-    for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
-        if (predicate(element)) {
-            return [index];
+    Kira.Generator.prototype.toArray = function() {
+        var result = [];
+        for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
+            result.push(element);
         }
-        index++;
-    }
-    return [];
-};
+        return result;
+    };
 
-Kira.Generator.prototype.get = function(index) {
-    var currentIndex = 0;
-    for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
-        if (currentIndex === index) {
-            return [element];
+    Kira.Generator.prototype.toSet = function() {
+        var result = {};
+        for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
+            result[element] = true;
         }
-        currentIndex++;
-    }
-    return [];
-};
-
-Kira.Generator.prototype.toArray = function() {
-    var result = [];
-    for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
-        result.push(element);
-    }
-    return result;
-};
-
-Kira.Generator.prototype.toSet = function() {
-    var result = {};
-    for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
-        result[element] = true;
-    }
-    return result;
-};
+        return result;
+    };

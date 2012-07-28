@@ -14,33 +14,37 @@
  limitations under the License.
  */
 
-Kira.options = {
-    get: function(object, key) {
-        var result = object[key];
-        return result === undefined ? [] : [result];
-    },
+//////////////////////////////
+//         Options          //
+//////////////////////////////
 
-    getOrElse: function(object, key, defaultValue) {
-        var result = object[key];
-        return result === undefined ? defaultValue : result;
-    },
+    Kira.options = {
+        get: function(object, key) {
+            var result = object[key];
+            return result === undefined ? [] : [result];
+        },
 
-    getOrElseLazy: function(object, key, defaultValue) {
-        var result = object[key];
-        return result === undefined ? defaultValue() : result;
-    },
+        getOrElse: function(object, key, defaultValue) {
+            var result = object[key];
+            return result === undefined ? defaultValue : result;
+        },
 
-    orElse: function(object, key, defaultValue) {
-        var result = object[key];
-        return result === undefined ? defaultValue : [result];
-    },
+        getOrElseLazy: function(object, key, defaultValue) {
+            var result = object[key];
+            return result === undefined ? defaultValue() : result;
+        },
 
-    orElseLazy: function(object, key, defaultValue) {
-        var result = object[key];
-        return result === undefined ? defaultValue() : [result];
-    },
+        orElse: function(object, key, defaultValue) {
+            var result = object[key];
+            return result === undefined ? defaultValue : [result];
+        },
 
-    nullable: function(nullable) {
-        return nullable === null || nullable === undefined ? [] : [nullable];
-    }
-};
+        orElseLazy: function(object, key, defaultValue) {
+            var result = object[key];
+            return result === undefined ? defaultValue() : [result];
+        },
+
+        nullable: function(nullable) {
+            return nullable === null || nullable === undefined ? [] : [nullable];
+        }
+    };

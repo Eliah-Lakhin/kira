@@ -15,3 +15,4 @@
  */
 
 (function() {
+    var context = this;
