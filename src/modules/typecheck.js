@@ -14,7 +14,7 @@
  limitations under the License.
  */
 
-(function(Kira) {
+(function() {
     Kira.typecheck = {
         isArray: Array.isArray || function(candidate) {
             return Object.prototype.toString.call(candidate) === "[object Array]";
@@ -48,4 +48,4 @@
             return Object.prototype.toString.call(candidate) === "[object RegExp]";
         }
     };
-})(Kira);
+})();

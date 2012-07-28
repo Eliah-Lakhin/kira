@@ -5,7 +5,18 @@ module.exports = function(grunt) {
             banner: grunt.file.read("misc/banner.txt")
         },
         lint: {
-            files: ["grunt.js", "src/*.js"]
+            grunt: "grunt.js",
+            sources: [
+                "src/base.js",
+                "src/modules/conflict.js",
+                "src/modules/typecheck.js",
+                "src/modules/console.js",
+                "src/modules/objects.js",
+                "src/modules/arrays.js",
+                "src/modules/options.js",
+                "src/modules/generators.js",
+                "src/modules/ranges.js"
+            ]
         },
         concat: {
             sources: {

@@ -15,15 +15,11 @@
  */
 
 var Kira = function(source) {
-    if (Kira.isArray(source)) {
-        return Kira.createArrayGenerator(source);
-    } else if (Kira.isFunction(source)) {
+    if (Kira.isArray(source) || Kira.typecheck.isObject(source)) {
         return new Kira.Generator(source);
-    } else if (Kira.isNumber(source)) {
+    } else if (Kira.typecheck.isNumber(source)) {
         var left = Math.floor(source);
-        var right = arguments[1] !== undefined && Kira.isNumber(arguments[1]) ? Math.ceil(arguments[1]) : left + 1;
+        var right = arguments[1] !== undefined && Kira.typecheck.isNumber(arguments[1]) ? Math.ceil(arguments[1]) : left + 1;
         return new Kira.Range(left, right);
-    } else if (Kira.isObject(source)) {
-        return new Kira.createEntryGenerator(source);
     }
 };
