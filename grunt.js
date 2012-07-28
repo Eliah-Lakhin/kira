@@ -23,11 +23,12 @@ module.exports = function(grunt) {
         jstdServer: {
             port: 9876,
             config: "test/kira-base-features.jstd",
-            driver: "lib/JsTestDriver.jar"
+            driver: "lib/JsTestDriver.jar",
+            browsers: "chrome"
         }
     });
 
     grunt.loadTasks("misc/tasks");
 
-    grunt.registerTask("default", "jstdServer");
+    grunt.registerTask("default", "jstd");
 };
