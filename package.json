@@ -1,8 +1,8 @@
 {
     "name": "Kira",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "author": "Ilya Lakhin(Илья Александрович Лахин) <eliah.lakhin@gmail.com>",
-    "description": "a library for functional programming in JavaScript and working lazy evaluation data collections",
+    "description": "a library for functional programming in JavaScript and working with lazy evaluation data collections",
     "contributors": [
         {
             "name": "Ilya Lakhin(Илья Александрович Лахин)",
