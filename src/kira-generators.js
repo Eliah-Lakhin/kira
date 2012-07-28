@@ -41,7 +41,7 @@ Kira.Generator = function(source) {
                         }
                     }
                 };
-            }
+            };
         }
     }
 };
@@ -133,8 +133,9 @@ Kira.Generator.prototype.filter = function(predicate) {
         var sourceIterator = source.iterator();
         return {
             next: function() {
+                var sourceElement;
                 do {
-                    var sourceElement = sourceIterator.next();
+                    sourceElement = sourceIterator.next();
                 } while (sourceElement !== undefined && !predicate(sourceElement));
                 return sourceElement;
             }
@@ -198,7 +199,8 @@ Kira.Generator.prototype.dropWhile = function(predicate) {
                     if (element === undefined) {
                         return;
                     }
-                    if (dropped = !predicate(element)) {
+                    dropped = !predicate(element);
+                    if (dropped) {
                         return element;
                     }
                 }

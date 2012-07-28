@@ -4,6 +4,9 @@ module.exports = function(grunt) {
         meta: {
             banner: grunt.file.read("misc/banner.txt")
         },
+        lint: {
+            files: ["grunt.js", "src/*.js"]
+        },
         concat: {
             sources: {
                 src: ["<banner>", "<file_strip_banner:src/kira.js>"],
@@ -18,17 +21,30 @@ module.exports = function(grunt) {
         },
         watch: {
             files: ["src/*.js", "test/*.js"],
-            tasks: "concat min"
+            tasks: "lint"
         },
         jstdServer: {
             port: 9876,
             config: "test/kira-base-features.jstd",
             driver: "lib/JsTestDriver.jar",
             browsers: "chrome"
+        },
+        jshint: {
+            options: {
+                bitwise: true,
+                camelcase: true,
+                curly: true,
+                eqeqeq: true,
+                latedef: true,
+                noempty: true,
+                quotmark: "double",
+                regexp: true
+
+            }
         }
     });
 
     grunt.loadTasks("misc/tasks");
 
-    grunt.registerTask("default", "jstd");
+    grunt.registerTask("default", "lint watch");
 };

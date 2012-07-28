@@ -27,7 +27,7 @@ Kira.Range = function(left, right) {
     }
 };
 
-Kira.Range.undefined = new Kira.Range();
+Kira.Range.notdefined = new Kira.Range();
 
 Kira.Range.index = new Kira.Range(0, 0x10000000);
 

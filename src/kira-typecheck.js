@@ -19,18 +19,33 @@
         isArray: Array.isArray || function(candidate) {
             return Object.prototype.toString.call(candidate) === "[object Array]";
         },
-        isObject: function(candidate) {return candidate === Object(candidate);}
+
+        isObject: function(candidate) {
+            return candidate === Object(candidate);
+        },
+
+        isArguments: function(candidate) {
+            return Object.prototype.toString.call(candidate) === "[object Arguments]";
+        },
+
+        isFunction: function(candidate) {
+            return Object.prototype.toString.call(candidate) === "[object Function]";
+        },
+
+        isString: function(candidate) {
+            return Object.prototype.toString.call(candidate) === "[object String]";
+        },
+
+        isNumber: function(candidate) {
+            return Object.prototype.toString.call(candidate) === "[object Number]";
+        },
+
+        isDate: function(candidate) {
+            return Object.prototype.toString.call(candidate) === "[object Date]";
+        },
+
+        isRegExp: function(candidate) {
+            return Object.prototype.toString.call(candidate) === "[object RegExp]";
+        }
     };
-
-    var baseTypes = ["Arguments", "Function", "String", "Number", "Date", "RegExp"];
-
-    for (var index = 0, length = baseTypes.length; index < length; index++) {
-        (function() {
-            var baseType = baseTypes[index];
-            var gauge = "[object " + baseType + "]";
-            Kira.typecheck["is" + baseType] = function(candidate) {
-                return Object.prototype.toString.call(candidate) === gauge;
-            };
-        })();
-    }
 })(Kira);
