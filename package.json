@@ -19,5 +19,10 @@
         "lazy",
         "collections"
     ],
-    "license": "APL2"
+    "licenses": [
+        {
+            "type": "APL2",
+            "url": "https://github.com/Eliah-Lakhin/kira/blob/master/LICENSE"
+        }
+    ]
 }
