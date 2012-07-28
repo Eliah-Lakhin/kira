@@ -17,6 +17,9 @@ module.exports = function(grunt) {
                 "src/modules/ranges.js"
             ]
         },
+        clean: {
+            build: ["build/full", "build/min"]
+        },
         concat: {
             sources: {
                 src: ["<banner>",
@@ -66,9 +69,11 @@ module.exports = function(grunt) {
         }
     });
 
+    grunt.loadNpmTasks('grunt-contrib');
+
     grunt.loadTasks("misc/tasks");
 
-    grunt.registerTask("build", "lint concat min");
+    grunt.registerTask("build", "lint clean concat min");
 
     grunt.registerTask("build-test", "build jstd");
 
