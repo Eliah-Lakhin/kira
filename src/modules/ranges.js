@@ -18,7 +18,7 @@
 //          Ranges          //
 //////////////////////////////
 
-    Kira.Range = function(left, right) {
+    kira.Range = function(left, right) {
         this._defined = left !== undefined && right !== undefined && left <= right;
         if (this._defined) {
             this._left = left;
@@ -31,46 +31,54 @@
         }
     };
 
-    Kira.Range.notdefined = new Kira.Range();
+    kira.Range.notdefined = new kira.Range();
 
-    Kira.Range.index = new Kira.Range(0, 0x10000000);
+    kira.Range.index = new kira.Range(0, 0x10000000);
 
-    Kira.Range.prototype.isDefined = function() {
+    kira.Range.prototype.isDefined = function() {
         return this._defined;
     };
 
-    Kira.Range.prototype.getLeft = function() {
+    kira.Range.prototype.getLeft = function() {
         return this._left;
     };
 
-    Kira.Range.prototype.getRight = function() {
+    kira.Range.prototype.getRight = function() {
         return this._right;
     };
 
-    Kira.Range.prototype.getLength = function() {
+    kira.Range.prototype.getLength = function() {
         return this._length;
     };
 
-    Kira.Range.prototype.map = function(leftMapper, rightMapper) {
+    kira.Range.prototype.map = function(leftMapper, rightMapper) {
         if (this._defined) {
-            return new Kira.Range(leftMapper(this._left), rightMapper === undefined ? leftMapper(this._right) : rightMapper(this._right));
+            return new kira.Range(leftMapper(this._left), rightMapper === undefined ? leftMapper(this._right) : rightMapper(this._right));
         } else {
             return this;
         }
     };
 
-    Kira.Range.prototype.unionWithPoint = function(point) {
-        point = Math.floor(point);
-        if (this._defined) {
-            return new Kira.Range(Math.min(point, this._left), Math.max(point + 1, this._right));
+    kira.Range.prototype.union = function(another) {
+        if (kira.typechec.isNumber(another)) {
+            return this.unionWithPoint(another);
         } else {
-            return new Kira.Range(point, point + 1);
+            return this.unionWithRange(another);
         }
     };
 
-    Kira.Range.prototype.unionWithRange = function(another) {
+    kira.Range.prototype.unionWithPoint = function(point) {
+        point = Math.floor(point);
+        if (this._defined) {
+            return new kira.Range(Math.min(point, this._left), Math.max(point + 1, this._right));
+        } else {
+            return new kira.Range(point, point + 1);
+        }
+    };
+
+    kira.Range.prototype.unionWithRange = function(another) {
         if (this._defined && another._defined) {
-            return new Kira.Range(Math.min(this._left, another._left), Math.max(this._right, another._right));
+            return new kira.Range(Math.min(this._left, another._left), Math.max(this._right, another._right));
         } else if (this._defined) {
             return this;
         } else {
@@ -78,16 +86,16 @@
         }
     };
 
-    Kira.Range.prototype.inject = function(injection) {
+    kira.Range.prototype.inject = function(injection) {
         if (this._defined && injection._defined) {
             if (this._right <= injection._left) {
-                return new Kira.Range(this._left, injection._right);
+                return new kira.Range(this._left, injection._right);
             } else if (injection._right <= this._left) {
-                return new Kira.Range(injection._left, this._right);
+                return new kira.Range(injection._left, this._right);
             } else if (this._left <= injection._left) {
-                return new Kira.Range(this._left, this._right + injection._length);
+                return new kira.Range(this._left, this._right + injection._length);
             } else {
-                return new Kira.Range(injection._left, injection._right + this._length);
+                return new kira.Range(injection._left, injection._right + this._length);
             }
         } else if (this._defined) {
             return this;
@@ -96,35 +104,51 @@
         }
     };
 
-    Kira.Range.prototype.enlarge = function(pair) {
+    kira.Range.prototype.enlarge = function(pair) {
         if (this._defined) {
-            return new Kira.Range(this._left - pair[0], this._right + pair[1]);
+            return new kira.Range(this._left - pair[0], this._right + pair[1]);
         } else {
             return this;
         }
     };
 
-    Kira.Range.prototype.shift = function(offset) {
+    kira.Range.prototype.shift = function(offset) {
         if (this._defined) {
-            return new Kira.Range(this._left + offset, this._right + offset);
+            return new kira.Range(this._left + offset, this._right + offset);
         } else {
             return this;
         }
     };
 
-    Kira.Range.prototype.substring = function(string) {
+    kira.Range.prototype.sub = function(source) {
+        if (kira.typecheck.isString(source)) {
+            return this.substring(source);
+        } else {
+            return this.subarray(source);
+        }
+    };
+
+    kira.Range.prototype.replace = function(source, replacement) {
+        if (kira.typecheck.isString(source)) {
+            return this.replaceString(source, replacement);
+        } else {
+            return this.replaceArray(source, replacement);
+        }
+    };
+
+    kira.Range.prototype.substring = function(string) {
         return this._defined ? string.substring(this._left, this._right) : "";
     };
 
-    Kira.Range.prototype.replaceString = function(source, replacement) {
+    kira.Range.prototype.replaceString = function(source, replacement) {
         return this._defined ? source.substring(0, this._left) + replacement + source.substring(this._right) : source;
     };
 
-    Kira.Range.prototype.subarray = function(array) {
+    kira.Range.prototype.subarray = function(array) {
         return this._defined ? array.slice(this._left, this._right) : [];
     };
 
-    Kira.Range.prototype.replaceArray = function(source, replacement) {
+    kira.Range.prototype.replaceArray = function(source, replacement) {
         var result = source.slice(0);
         if (this._defined) {
             var spliceArguments = replacement.slice(0);
@@ -134,14 +158,14 @@
         return result;
     };
 
-    Kira.Range.prototype.limit = function(generator) {
-        return this._defined ? Kira.limitedGenerator(generator, this._left, this._right) : Kira.empty;
+    kira.Range.prototype.limit = function(generator) {
+        return this._defined ? kira.limitedGenerator(generator, this._left, this._right) : kira.empty;
     };
 
-    Kira.Range.prototype.toGenerator = function() {
+    kira.Range.prototype.toGenerator = function() {
         var range = this;
         if (this._defined) {
-            var result = new Kira.Generator();
+            var result = new kira.Generator();
             result.iterator = function() {
                 var cursor = range._left - 1;
                 return {
@@ -155,14 +179,14 @@
             };
             return result;
         } else {
-            return Kira.Generator.empty;
+            return kira.Generator.empty;
         }
     };
 
-    Kira.Range.prototype.toOption = function() {
+    kira.Range.prototype.toOption = function() {
         return this._defined ? [this] : [];
     };
 
-    Kira.Range.prototype.toString = function() {
+    kira.Range.prototype.toString = function() {
         return this._defined ? "Range(" + this._left + ", " + this._right + ")" : "Range()";
     };

@@ -18,12 +18,21 @@
 //          Base            //
 //////////////////////////////
 
-    var Kira = function(source) {
-        if (Kira.isArray(source) || Kira.typecheck.isObject(source)) {
-            return new Kira.Generator(source);
-        } else if (Kira.typecheck.isNumber(source)) {
+    var kira = function(source) {
+        if (kira.typecheck.isArray(source) || kira.typecheck.isObject(source)) {
+            return new kira.Generator(source);
+        } else if (kira.typecheck.isNumber(source)) {
             var left = Math.floor(source);
-            var right = arguments[1] !== undefined && Kira.typecheck.isNumber(arguments[1]) ? Math.ceil(arguments[1]) : left + 1;
-            return new Kira.Range(left, right);
+            var right = arguments[1] !== undefined && kira.typecheck.isNumber(arguments[1]) ? Math.ceil(arguments[1]) : left + 1;
+            return new kira.Range(left, right);
         }
+    };
+
+    var conflicted = context.kira;
+
+    context.kira = kira;
+
+    kira.noConflict = function() {
+        context.kira = conflicted;
+        return kira;
     };

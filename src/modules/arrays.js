@@ -26,7 +26,7 @@
         nativeReduce = Array.prototype.reduce,
         nativeIndexOf = Array.prototype.indexOf;
 
-    Kira.arrays = {
+    kira.arrays = {
         map: function(array, functor) {
             if (array.map === nativeMap && nativeMap !== undefined) {
                 return array.map(functor);
@@ -154,7 +154,7 @@
 
         find: function(array, predicate) {
             var result;
-            return Kira.any(array, function(value) {
+            return kira.any(array, function(value) {
                 if (predicate(value)) {
                     result = value;
                     return true;

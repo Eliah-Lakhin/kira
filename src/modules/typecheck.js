@@ -18,7 +18,7 @@
 //         Typecheck        //
 //////////////////////////////
 
-    Kira.typecheck = {
+    kira.typecheck = {
         isArray: Array.isArray || function(candidate) {
             return Object.prototype.toString.call(candidate) === "[object Array]";
         },

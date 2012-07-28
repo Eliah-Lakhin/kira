@@ -1,0 +1,14 @@
+server: http://localhost:9876
+
+load:
+  - "../build/Kira-min.js"
+
+test:
+  - "base.js"
+  - "typecheck.js"
+  - "console.js"
+  - "objects.js"
+  - "arrays.js"
+  - "options.js"
+  - "generators.js"
+  - "ranges.js"

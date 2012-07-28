@@ -20,7 +20,7 @@
 
     var console = context.console;
 
-    Kira.console = {
+    kira.console = {
         log: function(message) {
             console.log(message);
             return message;
@@ -35,6 +35,6 @@
                 block = message;
                 message = "%s";
             }
-            console.log(message.replace("%s", Kira.profile(block)));
+            console.log(message.replace("%s", kira.profile(block)));
         }
     };

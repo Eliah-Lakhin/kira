@@ -20,7 +20,7 @@
 
     var nativeGetOwnPropertyNames = Object.getOwnPropertyNames;
 
-    Kira.objects = {
+    kira.objects = {
         extend: function() {
             var result = {};
             for (var argumentIndex = 0, argumentLength = arguments.length; argumentIndex < argumentLength; argumentIndex++) {

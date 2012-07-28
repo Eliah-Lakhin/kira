@@ -14,15 +14,16 @@
  limitations under the License.
  */
 
-//////////////////////////////
-//         Conflict         //
-//////////////////////////////
+TestCase("Kira Base module", {
+    "testDefinition": function() {
+        assertNotUndefined(kira);
+    },
 
-    var conflicted = context.Kira;
-
-    context.Kira = Kira;
-
-    Kira.noConflict = function() {
-        context.Kira = conflicted;
-        return Kira;
-    };
+    "testNoConflict": function() {
+        assertNotUndefined(kira);
+        var reference = kira.noConflict();
+        assertUndefined(kira);
+        assertNotUndefined(reference);
+        kira = reference;
+    }
+});

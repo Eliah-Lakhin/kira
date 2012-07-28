@@ -8,7 +8,6 @@ module.exports = function(grunt) {
             grunt: "grunt.js",
             sources: [
                 "src/base.js",
-                "src/modules/conflict.js",
                 "src/modules/typecheck.js",
                 "src/modules/console.js",
                 "src/modules/objects.js",
@@ -23,7 +22,6 @@ module.exports = function(grunt) {
                 src: ["<banner>",
                     "<file_strip_banner:src/wrappers/intro.js>",
                     "<file_strip_banner:src/base.js>",
-                    "<file_strip_banner:src/modules/conflict.js>",
                     "<file_strip_banner:src/modules/typecheck.js>",
                     "<file_strip_banner:src/modules/console.js>",
                     "<file_strip_banner:src/modules/objects.js>",
@@ -32,14 +30,14 @@ module.exports = function(grunt) {
                     "<file_strip_banner:src/modules/generators.js>",
                     "<file_strip_banner:src/modules/ranges.js>",
                     "<file_strip_banner:src/wrappers/outro.js>"],
-                dest: "build/<%= pkg.name %>-<%= pkg.version %>.js",
+                dest: "build/<%= pkg.name %>.js",
                 separator: "\n\n"
             }
         },
         min: {
             dist: {
-                src: "build/<%= pkg.name %>-<%= pkg.version %>.js",
-                dest: "build/<%= pkg.name %>-min-<%= pkg.version %>.js"
+                src: "build/<%= pkg.name %>.js",
+                dest: "build/<%= pkg.name %>-min.js"
             }
         },
         watch: {
@@ -48,7 +46,7 @@ module.exports = function(grunt) {
         },
         jstdServer: {
             port: 9876,
-            config: "test/kira-base-features.jstd",
+            config: "test/kira.jstd",
             driver: "lib/JsTestDriver.jar",
             browsers: "chrome"
         },

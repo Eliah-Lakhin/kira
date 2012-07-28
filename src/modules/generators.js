@@ -18,9 +18,9 @@
 //        Generators        //
 //////////////////////////////
 
-    Kira.Generator = function(source) {
+    kira.Generator = function(source) {
         if (source !== undefined) {
-            if (Kira.typecheck.isArray(source)) {
+            if (kira.typecheck.isArray(source)) {
                 this.iterator = function() {
                     var length = source.length;
                     var index = 0;
@@ -34,7 +34,7 @@
                 };
             } else {
                 this.iterator = function() {
-                    var keys = Kira.objects.keys(source);
+                    var keys = kira.objects.keys(source);
                     var length = keys.length;
                     var index = 0;
                     return {
@@ -50,18 +50,18 @@
         }
     };
 
-    Kira.Generator.empty = new Kira.Generator();
+    kira.Generator.empty = new kira.Generator();
 
-    Kira.Generator.prototype.iterator = function() {
+    kira.Generator.prototype.iterator = function() {
         return {
             next: function() {}
         };
     };
 
-    Kira.Generator.prototype.cache = function() {
+    kira.Generator.prototype.cache = function() {
         var source = this;
         var cacheGenerator;
-        var result = new Kira.Generator();
+        var result = new kira.Generator();
         result.iterator = function() {
             if (cacheGenerator === undefined) {
                 var cache = [];
@@ -72,7 +72,7 @@
                         if (sourceElement !== undefined) {
                             cache.push(sourceElement);
                         } else {
-                            cacheGenerator = new Kira.Generator(cache);
+                            cacheGenerator = new kira.Generator(cache);
                         }
                         return sourceElement;
                     }
@@ -84,9 +84,9 @@
         return result;
     };
 
-    Kira.Generator.prototype.map = function(functor) {
+    kira.Generator.prototype.map = function(functor) {
         var source = this;
-        var result = new Kira.Generator();
+        var result = new kira.Generator();
         result.iterator = function() {
             var sourceIterator = source.iterator();
             return {
@@ -101,9 +101,9 @@
         return result;
     };
 
-    Kira.Generator.prototype.flat = function(functor) {
+    kira.Generator.prototype.flat = function(functor) {
         var source = this;
-        var result = new Kira.Generator();
+        var result = new kira.Generator();
         result.iterator = function() {
             var sourceIterator = source.iterator();
             var elementMapping;
@@ -130,9 +130,9 @@
         return result;
     };
 
-    Kira.Generator.prototype.filter = function(predicate) {
+    kira.Generator.prototype.filter = function(predicate) {
         var source = this;
-        var result = new Kira.Generator();
+        var result = new kira.Generator();
         result.iterator = function() {
             var sourceIterator = source.iterator();
             return {
@@ -148,9 +148,9 @@
         return result;
     };
 
-    Kira.Generator.prototype.zip = function(right) {
+    kira.Generator.prototype.zip = function(right) {
         var left = this;
-        var result = new Kira.Generator();
+        var result = new kira.Generator();
         result.iterator = function() {
             var leftIterator = left.iterator();
             var rightIterator = right.iterator();
@@ -167,9 +167,9 @@
         return result;
     };
 
-    Kira.Generator.prototype.drop = function(count) {
+    kira.Generator.prototype.drop = function(count) {
         var source = this;
-        var result = new Kira.Generator();
+        var result = new kira.Generator();
         result.iterator = function() {
             var iterator = source.iterator();
             var dropped = false;
@@ -190,9 +190,9 @@
         return result;
     };
 
-    Kira.Generator.prototype.dropWhile = function(predicate) {
+    kira.Generator.prototype.dropWhile = function(predicate) {
         var source = this;
-        var result = new Kira.Generator();
+        var result = new kira.Generator();
         result.iterator = function() {
             var iterator = source.iterator();
             var dropped = false;
@@ -215,9 +215,9 @@
         return result;
     };
 
-    Kira.Generator.prototype.limit = function(min, max) {
+    kira.Generator.prototype.limit = function(min, max) {
         var source = this;
-        var result = new Kira.Generator();
+        var result = new kira.Generator();
         result.iterator = function() {
             var iterator = source.iterator();
             var dropped = false;
@@ -242,9 +242,9 @@
         return result;
     };
 
-    Kira.Generator.prototype.take = function(count) {
+    kira.Generator.prototype.take = function(count) {
         var source = this;
-        var result = new Kira.Generator();
+        var result = new kira.Generator();
         result.iterator = function() {
             var iterator = source.iterator();
             var index = 0;
@@ -259,9 +259,9 @@
         return result;
     };
 
-    Kira.Generator.prototype.takeWhile = function(predicate) {
+    kira.Generator.prototype.takeWhile = function(predicate) {
         var source = this;
-        var result = new Kira.Generator();
+        var result = new kira.Generator();
         result.iterator = function() {
             var iterator = source.iterator();
             var execution = true;
@@ -279,9 +279,9 @@
         return result;
     };
 
-    Kira.Generator.prototype.concatenate = function(right) {
+    kira.Generator.prototype.concatenate = function(right) {
         var left = this;
-        var result = new Kira.Generator();
+        var result = new kira.Generator();
         result.iterator = function() {
             var leftIterator = left.iterator();
             var rightIterator;
@@ -304,7 +304,7 @@
         return result;
     };
 
-    Kira.Generator.prototype.each = function(step) {
+    kira.Generator.prototype.each = function(step) {
         for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
             if (step(element) === false) {
                 break;
@@ -312,7 +312,7 @@
         }
     };
 
-    Kira.Generator.prototype.all = function(predicate) {
+    kira.Generator.prototype.all = function(predicate) {
         for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
             if (!predicate(element)) {
                 return false;
@@ -321,7 +321,7 @@
         return true;
     };
 
-    Kira.Generator.prototype.any = function(predicate) {
+    kira.Generator.prototype.any = function(predicate) {
         for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
             if (predicate(element)) {
                 return true;
@@ -330,14 +330,14 @@
         return false;
     };
 
-    Kira.Generator.prototype.fold = function(init, folder) {
+    kira.Generator.prototype.fold = function(init, folder) {
         for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
             init = folder(element, init);
         }
         return init;
     };
 
-    Kira.Generator.prototype.reduce = function(folder) {
+    kira.Generator.prototype.reduce = function(folder) {
         var iterator = this.iterator();
         var result = iterator.next();
         if (result === undefined) {
@@ -354,7 +354,7 @@
         return [result];
     };
 
-    Kira.Generator.prototype.find = function(predicate) {
+    kira.Generator.prototype.find = function(predicate) {
         for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
             if (predicate(element)) {
                 return [element];
@@ -363,7 +363,7 @@
         return [];
     };
 
-    Kira.Generator.prototype.index = function(predicate) {
+    kira.Generator.prototype.index = function(predicate) {
         var index = 0;
         for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
             if (predicate(element)) {
@@ -374,7 +374,7 @@
         return [];
     };
 
-    Kira.Generator.prototype.get = function(index) {
+    kira.Generator.prototype.get = function(index) {
         var currentIndex = 0;
         for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
             if (currentIndex === index) {
@@ -385,7 +385,7 @@
         return [];
     };
 
-    Kira.Generator.prototype.toArray = function() {
+    kira.Generator.prototype.toArray = function() {
         var result = [];
         for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
             result.push(element);
@@ -393,7 +393,7 @@
         return result;
     };
 
-    Kira.Generator.prototype.toSet = function() {
+    kira.Generator.prototype.toSet = function() {
         var result = {};
         for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
             result[element] = true;
