@@ -16,18 +16,18 @@
 
 TestCase("Kira Object module", {
     "testExtend": function() {
-        assertSame({a: 1, b: 2}, kira.objects.extend({a: 1, b: 2}, {}));
-        assertSame({a: 1, b: 2, c: 3}, kira.objects.extend({a: 1, b: 2}, {c: 3}));
-        assertSame({a: 1, b: 3, c: 3}, kira.objects.extend({a: 1, b: 2}, {b: 3, c: 3}));
-        assertSame({b: 3, c: 4}, kira.objects.extend({}, {b: 3, c: 4}));
+        assertEquals({a: 1, b: 2}, kira.objects.extend({a: 1, b: 2}, {}));
+        assertEquals({a: 1, b: 2, c: 3}, kira.objects.extend({a: 1, b: 2}, {c: 3}));
+        assertEquals({a: 1, b: 3, c: 3}, kira.objects.extend({a: 1, b: 2}, {b: 3, c: 3}));
+        assertEquals({b: 3, c: 4}, kira.objects.extend({}, {b: 3, c: 4}));
     },
 
     "testAppend": function() {
-        assertSame([1, 2, 3, 4], kira.objects.append([1, 2, 3], 4));
-        assertSame({a: 1, b: 2, c: 3, d: 4}, kira.objects.append({a: 1, b: 2, c: 3}, "d", 4));
+        assertEquals([1, 2, 3, 4], kira.objects.append([1, 2, 3], 4));
+        assertEquals({a: 1, b: 2, c: 3, d: 4}, kira.objects.append({a: 1, b: 2, c: 3}, "d", 4));
     },
 
     "testKeys": function() {
-        assertSame(3, kira.objects.keys({a: 1, b: 2, c: 3}).length);
+        assertEquals(3, kira.objects.keys({a: 1, b: 2, c: 3}).length);
     }
 });

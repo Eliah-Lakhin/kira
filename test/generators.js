@@ -16,7 +16,7 @@
 
 TestCase("Kira Generators module", {
     "testConstructor": function() {
-        assertSame(new kira.Generator([0, 1, 3, 4]).toArray(), kira([0, 1, 3, 4]).toArray());
+        assertEquals(new kira.Generator([0, 1, 3, 4]).toArray(), kira([0, 1, 3, 4]).toArray());
     },
 
     "testEmptyGenerator": function() {
@@ -28,7 +28,7 @@ TestCase("Kira Generators module", {
     },
 
     "testEntryGenerator": function() {
-        assertSame([
+        assertEquals([
             ["a", 1],
             ["b", 2],
             ["c", 3]
@@ -51,25 +51,25 @@ TestCase("Kira Generators module", {
     },
 
     "testMap": function() {
-        assertSame([0, 2, 4], new kira.Generator([0, 1, 2]).map(function(value) {return value * 2;}).toArray());
+        assertEquals([0, 2, 4], new kira.Generator([0, 1, 2]).map(function(value) {return value * 2;}).toArray());
     },
 
     "testFlat": function() {
-        assertSame([0, 0, 1, 1, 4, 6], new kira.Generator([0, 1, 2, 3]).flat(function(value) {
+        assertEquals([0, 0, 1, 1, 4, 6], new kira.Generator([0, 1, 2, 3]).flat(function(value) {
             return value < 2 ? new kira.Generator([value, value]) : new kira.Generator([value * 2]);
         }).toArray());
 
-        assertSame([1, 1, 3, 3], new kira.Generator([0, 1, 2, 3]).flat(function(value) {
+        assertEquals([1, 1, 3, 3], new kira.Generator([0, 1, 2, 3]).flat(function(value) {
             return value % 2 == 0 ? new kira.Generator([]) : new kira.Generator([value, value]);
         }).toArray());
     },
 
     "testFilter": function() {
-        assertSame([0, 2, 4], new kira.Generator([0, 1, 2, 3, 4]).filter(function(value) {return value % 2 == 0;}).toArray());
+        assertEquals([0, 2, 4], new kira.Generator([0, 1, 2, 3, 4]).filter(function(value) {return value % 2 == 0;}).toArray());
     },
 
     "testZip": function() {
-        assertSame(
+        assertEquals(
             [
                 [0, "zero"],
                 [1, "one"],
@@ -80,17 +80,17 @@ TestCase("Kira Generators module", {
     },
 
     "testDrop": function() {
-        assertSame([1, 2, 3, 4], new kira.Generator([0, 1, 2, 3, 4]).drop(1).toArray());
-        assertSame([2, 3, 4], new kira.Generator([0, 1, 2, 3, 4]).dropWhile(function(value) {return value < 2;}).toArray());
+        assertEquals([1, 2, 3, 4], new kira.Generator([0, 1, 2, 3, 4]).drop(1).toArray());
+        assertEquals([2, 3, 4], new kira.Generator([0, 1, 2, 3, 4]).dropWhile(function(value) {return value < 2;}).toArray());
     },
 
     "testTake": function() {
-        assertSame([0, 1, 2], new kira.Generator([0, 1, 2, 3, 4]).take(3).toArray());
-        assertSame([0, 1], new kira.Generator([0, 1, 2, 3, 4]).takeWhile(function(value) {return value < 2;}).toArray());
+        assertEquals([0, 1, 2], new kira.Generator([0, 1, 2, 3, 4]).take(3).toArray());
+        assertEquals([0, 1], new kira.Generator([0, 1, 2, 3, 4]).takeWhile(function(value) {return value < 2;}).toArray());
     },
 
     "testConcatenate": function() {
-        assertSame([0, 1, 2, 3], new kira.Generator([0, 1]).concatenate(new kira.Generator([2, 3])).toArray());
+        assertEquals([0, 1, 2, 3], new kira.Generator([0, 1]).concatenate(new kira.Generator([2, 3])).toArray());
     },
 
     "testForEach": function() {
@@ -101,7 +101,7 @@ TestCase("Kira Generators module", {
                 return false;
             }
         });
-        assertSame([0, 1, 3, 4], result);
+        assertEquals([0, 1, 3, 4], result);
     },
 
     "testAll": function() {
@@ -119,32 +119,32 @@ TestCase("Kira Generators module", {
     },
 
     "testReduce": function() {
-        assertSame([8], kira([0, 1, 3, 4]).reduce(function(result, value) {return value + result;}));
-        assertSame([]. kira.empty.reduce(function(result, value) {return value + result;}));
+        assertEquals([8], kira([0, 1, 3, 4]).reduce(function(result, value) {return value + result;}));
+        assertEquals([], kira.Generator.empty.reduce(function(result, value) {return value + result;}));
     },
 
     "testFind": function() {
-        assertSame([3], kira([0, 1, 3, 4]).find(function(value) {return value > 1;}));
-        assertSame([], kira([0, 1, 3, 4]).find(function(value) {return value > 10;}));
+        assertEquals([3], kira([0, 1, 3, 4]).find(function(value) {return value > 1;}));
+        assertEquals([], kira([0, 1, 3, 4]).find(function(value) {return value > 10;}));
     },
 
     "testIndex": function() {
-        assertSame([2], kira([0, 1, 3, 4]).index(function(value) {return value > 1;}));
-        assertSame([], kira([0, 1, 3, 4]).index(function(value) {return value > 10;}));
+        assertEquals([2], kira([0, 1, 3, 4]).index(function(value) {return value > 1;}));
+        assertEquals([], kira([0, 1, 3, 4]).index(function(value) {return value > 10;}));
     },
 
     "testGet": function() {
-        assertSame([4], Kira([0, 1, 3, 4]).get(3));
-        assertSame([], Kira([0, 1, 3, 4]).get(5));
+        assertEquals([4], kira([0, 1, 3, 4]).get(3));
+        assertEquals([], kira([0, 1, 3, 4]).get(5));
     },
 
     "testCachedGenerator": function() {
         var source = [0, 1, 3, 4];
         var generator = kira(source);
         var cached = kira(source).cache();
-        assertSame([0, 1, 3, 4], cached.toArray());
+        assertEquals([0, 1, 3, 4], cached.toArray());
         source.push(5);
-        assertSame([0, 1, 3, 4], cached.toArray());
-        assertSame([0, 1, 3, 4, 5], generator.toArray());
+        assertEquals([0, 1, 3, 4], cached.toArray());
+        assertEquals([0, 1, 3, 4, 5], generator.toArray());
     }
 });

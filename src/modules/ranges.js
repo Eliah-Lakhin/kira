@@ -60,7 +60,7 @@
     };
 
     kira.Range.prototype.union = function(another) {
-        if (kira.typechec.isNumber(another)) {
+        if (kira.typecheck.isNumber(another)) {
             return this.unionWithPoint(another);
         } else {
             return this.unionWithRange(another);
@@ -159,7 +159,35 @@
     };
 
     kira.Range.prototype.limit = function(generator) {
-        return this._defined ? kira.limitedGenerator(generator, this._left, this._right) : kira.empty;
+        if (this._defined) {
+            var min = this._left;
+            var max = this._right;
+            var result = new kira.Generator();
+            result.iterator = function() {
+                var iterator = generator.iterator();
+                var dropped = false;
+                var index;
+                return {
+                    next: function() {
+                        if (!dropped) {
+                            dropped = true;
+                            index = -1;
+                            while (++index < min) {
+                                if (iterator.next() === undefined) {
+                                    return;
+                                }
+                            }
+                        }
+                        if (index++ < max) {
+                            return iterator.next();
+                        }
+                    }
+                };
+            };
+            return result;
+        } else {
+            return this;
+        }
     };
 
     kira.Range.prototype.toGenerator = function() {

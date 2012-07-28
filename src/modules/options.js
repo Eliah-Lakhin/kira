@@ -21,11 +21,11 @@
     kira.options = {
         get: function(object, key, defaultValue) {
             if (defaultValue === undefined) {
-                return kira.getOption(object, key);
+                return kira.options.getOption(object, key);
             } else if (kira.typecheck.isFunction(defaultValue)) {
-                return kira.getOrElseLazy(object, key, defaultValue);
+                return kira.options.getOrElseLazy(object, key, defaultValue);
             } else {
-                return kira.getOrElse(object, key, defaultValue);
+                return kira.options.getOrElse(object, key, defaultValue);
             }
         },
 
@@ -46,9 +46,9 @@
 
         orElse: function(object, key, defaultValue) {
             if (kira.typecheck.isFunction(defaultValue)) {
-                return kira.orElseLazy(object, key, defaultValue);
+                return kira.options.orElseLazy(object, key, defaultValue);
             } else {
-                return kira.orElseOption(object, key, defaultValue);
+                return kira.options.orElseOption(object, key, defaultValue);
             }
         },
 

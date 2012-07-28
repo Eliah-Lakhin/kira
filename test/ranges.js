@@ -16,11 +16,11 @@
 
 TestCase("Kira Ranges module", {
     "testConstructor": function() {
-        assertSame(new kira.Range(0, 5).toGenerator().toArray(), kira(0, 5).toGenerator().toArray());
+        assertEquals(new kira.Range(0, 5).toGenerator().toArray(), kira(0, 5).toGenerator().toArray());
 
-        assertSame([10], kira(10).toGenerator().toArray());
-        assertSame([0, 1, 2, 3, 4], kira(0, 5).toGenerator().toArray());
-        assertSame([], kira(10, 0).toGenerator().toArray());
+        assertEquals([10], kira(10).toGenerator().toArray());
+        assertEquals([0, 1, 2, 3, 4], kira(0, 5).toGenerator().toArray());
+        assertEquals([], kira(10, 0).toGenerator().toArray());
     },
 
     "testProperties": function() {
@@ -51,33 +51,33 @@ TestCase("Kira Ranges module", {
     },
 
     "testMap": function() {
-        assertSame([2, 3, 4, 5], kira(1, 3).map(function(bound) {return bound * 2;}).toGenerator().toArray());
-        assertSame([4, 5], kira(1, 3).map(
+        assertEquals([2, 3, 4, 5], kira(1, 3).map(function(bound) {return bound * 2;}).toGenerator().toArray());
+        assertEquals([4, 5], kira(1, 3).map(
             function(left) {return left + 3;},
             function(right) {return right * 2;}
         ).toGenerator().toArray());
     },
 
     "testUnionWithPoint": function() {
-        assertSame([0, 1, 2], kira(1, 3).unionWithPoint(0).toGenerator().toArray());
-        assertSame([1, 2], kira(1, 3).unionWithPoint(1).toGenerator().toArray());
-        assertSame([1, 2, 3], kira(1, 3).unionWithPoint(3).toGenerator().toArray());
+        assertEquals([0, 1, 2], kira(1, 3).unionWithPoint(0).toGenerator().toArray());
+        assertEquals([1, 2], kira(1, 3).unionWithPoint(1).toGenerator().toArray());
+        assertEquals([1, 2, 3], kira(1, 3).unionWithPoint(3).toGenerator().toArray());
 
-        assertSame([0, 1, 2], kira(1, 3).union(0).toGenerator().toArray());
-        assertSame([1, 2], kira(1, 3).union(1).toGenerator().toArray());
-        assertSame([1, 2, 3], kira(1, 3).union(3).toGenerator().toArray());
+        assertEquals([0, 1, 2], kira(1, 3).union(0).toGenerator().toArray());
+        assertEquals([1, 2], kira(1, 3).union(1).toGenerator().toArray());
+        assertEquals([1, 2, 3], kira(1, 3).union(3).toGenerator().toArray());
     },
 
     "testUnionWithRange": function() {
-        assertSame([1, 2, 3, 4], kira(1, 3).unionWithRange(kira(2, 5)).toGenerator().toArray());
-        assertSame([1, 2, 3, 4], kira(1, 3).unionWithRange(kira(3, 5)).toGenerator().toArray());
-        assertSame([1, 2, 3, 4], kira(1, 3).unionWithRange(kira(4, 5)).toGenerator().toArray());
-        assertSame([1, 2], kira(1, 3).unionWithRange(kira(1, 2)).toGenerator().toArray());
+        assertEquals([1, 2, 3, 4], kira(1, 3).unionWithRange(kira(2, 5)).toGenerator().toArray());
+        assertEquals([1, 2, 3, 4], kira(1, 3).unionWithRange(kira(3, 5)).toGenerator().toArray());
+        assertEquals([1, 2, 3, 4], kira(1, 3).unionWithRange(kira(4, 5)).toGenerator().toArray());
+        assertEquals([1, 2], kira(1, 3).unionWithRange(kira(1, 2)).toGenerator().toArray());
 
-        assertSame([1, 2, 3, 4], kira(1, 3).union(kira(2, 5)).toGenerator().toArray());
-        assertSame([1, 2, 3, 4], kira(1, 3).union(kira(3, 5)).toGenerator().toArray());
-        assertSame([1, 2, 3, 4], kira(1, 3).union(kira(4, 5)).toGenerator().toArray());
-        assertSame([1, 2], kira(1, 3).union(kira(1, 2)).toGenerator().toArray());
+        assertEquals([1, 2, 3, 4], kira(1, 3).union(kira(2, 5)).toGenerator().toArray());
+        assertEquals([1, 2, 3, 4], kira(1, 3).union(kira(3, 5)).toGenerator().toArray());
+        assertEquals([1, 2, 3, 4], kira(1, 3).union(kira(4, 5)).toGenerator().toArray());
+        assertEquals([1, 2], kira(1, 3).union(kira(1, 2)).toGenerator().toArray());
     },
 
     "testInject": function() {
@@ -88,14 +88,14 @@ TestCase("Kira Ranges module", {
     },
 
     "testEnlarge": function() {
-        assertSame([0, 1, 2, 3], kira(1, 3).enlarge([1, 1]).toGenerator().toArray());
-        assertSame([0, 1, 2, 3, 4], kira(1, 3).enlarge([1, 2]).toGenerator().toArray());
-        assertSame([], kira(1, 3).enlarge([-1, -1]).toGenerator().toArray());
+        assertEquals([0, 1, 2, 3], kira(1, 3).enlarge([1, 1]).toGenerator().toArray());
+        assertEquals([0, 1, 2, 3, 4], kira(1, 3).enlarge([1, 2]).toGenerator().toArray());
+        assertEquals([], kira(1, 3).enlarge([-1, -1]).toGenerator().toArray());
     },
 
     "testShift": function() {
-        assertSame([3, 4], kira(1, 3).shift(2).toGenerator().toArray());
-        assertSame([-1, 0], kira(1, 3).shift(-2).toGenerator().toArray());
+        assertEquals([3, 4], kira(1, 3).shift(2).toGenerator().toArray());
+        assertEquals([-1, 0], kira(1, 3).shift(-2).toGenerator().toArray());
     },
 
     "testToOption": function() {
@@ -128,38 +128,38 @@ TestCase("Kira Ranges module", {
     },
 
     "testSubarray": function() {
-        assertSame([2, 3], kira(2, 4).subarray([0, 1, 2, 3, 4, 5]));
-        assertSame([2, 3, 4, 5], kira(2, 100).subarray([0, 1, 2, 3, 4, 5]));
-        assertSame([0, 1, 2, 3, 4, 5], kira(-100, 100).subarray([0, 1, 2, 3, 4, 5]));
-        assertSame([], kira(50, 100).subarray([0, 1, 2, 3, 4, 5]));
+        assertEquals([2, 3], kira(2, 4).subarray([0, 1, 2, 3, 4, 5]));
+        assertEquals([2, 3, 4, 5], kira(2, 100).subarray([0, 1, 2, 3, 4, 5]));
+        assertEquals([0, 1, 2, 3, 4, 5], kira(-100, 100).subarray([0, 1, 2, 3, 4, 5]));
+        assertEquals([], kira(50, 100).subarray([0, 1, 2, 3, 4, 5]));
 
-        assertSame([2, 3], kira(2, 4).sub([0, 1, 2, 3, 4, 5]));
-        assertSame([2, 3, 4, 5], kira(2, 100).sub([0, 1, 2, 3, 4, 5]));
-        assertSame([0, 1, 2, 3, 4, 5], kira(-100, 100).sub([0, 1, 2, 3, 4, 5]));
-        assertSame([], kira(50, 100).sub([0, 1, 2, 3, 4, 5]));
+        assertEquals([2, 3], kira(2, 4).sub([0, 1, 2, 3, 4, 5]));
+        assertEquals([2, 3, 4, 5], kira(2, 100).sub([0, 1, 2, 3, 4, 5]));
+        assertEquals([0, 1, 2, 3, 4, 5], kira(-100, 100).sub([0, 1, 2, 3, 4, 5]));
+        assertEquals([], kira(50, 100).sub([0, 1, 2, 3, 4, 5]));
     },
 
     "testReplaceArray": function() {
-        assertSame([0, 1, "a", "b", 4, 5], kira(2, 4).replaceArray([0, 1, 2, 3, 4, 5], ["a", "b"]));
-        assertSame([0, 1, "a", "b"], kira(2, 100).replaceArray([0, 1, 2, 3, 4, 5], ["a", "b"]));
-        assertSame(["a", "b"], kira(-100, 100).replaceArray([0, 1, 2, 3, 4, 5], ["a", "b"]));
-        assertSame([0, 1, 2, 3, 4, 5, "a", "b"], kira(50, 100).replaceArray([0, 1, 2, 3, 4, 5], ["a", "b"]));
+        assertEquals([0, 1, "a", "b", 4, 5], kira(2, 4).replaceArray([0, 1, 2, 3, 4, 5], ["a", "b"]));
+        assertEquals([0, 1, "a", "b"], kira(2, 100).replaceArray([0, 1, 2, 3, 4, 5], ["a", "b"]));
+        assertEquals(["a", "b"], kira(-100, 100).replaceArray([0, 1, 2, 3, 4, 5], ["a", "b"]));
+        assertEquals([0, 1, 2, 3, 4, 5, "a", "b"], kira(50, 100).replaceArray([0, 1, 2, 3, 4, 5], ["a", "b"]));
 
-        assertSame([0, 1, "a", "b", 4, 5], kira(2, 4).replace([0, 1, 2, 3, 4, 5], ["a", "b"]));
-        assertSame([0, 1, "a", "b"], kira(2, 100).replace([0, 1, 2, 3, 4, 5], ["a", "b"]));
-        assertSame(["a", "b"], kira(-100, 100).replace([0, 1, 2, 3, 4, 5], ["a", "b"]));
-        assertSame([0, 1, 2, 3, 4, 5, "a", "b"], kira(50, 100).replace([0, 1, 2, 3, 4, 5], ["a", "b"]));
+        assertEquals([0, 1, "a", "b", 4, 5], kira(2, 4).replace([0, 1, 2, 3, 4, 5], ["a", "b"]));
+        assertEquals([0, 1, "a", "b"], kira(2, 100).replace([0, 1, 2, 3, 4, 5], ["a", "b"]));
+        assertEquals(["a", "b"], kira(-100, 100).replace([0, 1, 2, 3, 4, 5], ["a", "b"]));
+        assertEquals([0, 1, 2, 3, 4, 5, "a", "b"], kira(50, 100).replace([0, 1, 2, 3, 4, 5], ["a", "b"]));
     },
 
     "testLimit": function() {
-        assertSame([2, 3], kira(2, 4).limit(kira([0, 1, 2, 3, 4, 5])).toArray());
-        assertSame([2, 3, 4, 5], kira(2, 100).limit(kira([0, 1, 2, 3, 4, 5])).toArray());
-        assertSame([0, 1, 2, 3, 4, 5], kira(-100, 100).limit(kira([0, 1, 2, 3, 4, 5])).toArray());
-        assertSame([], kira(50, 100).limit(kira([0, 1, 2, 3, 4, 5])).toArray());
+        assertEquals([2, 3], kira(2, 4).limit(kira([0, 1, 2, 3, 4, 5])).toArray());
+        assertEquals([2, 3, 4, 5], kira(2, 100).limit(kira([0, 1, 2, 3, 4, 5])).toArray());
+        assertEquals([0, 1, 2, 3, 4, 5], kira(-100, 100).limit(kira([0, 1, 2, 3, 4, 5])).toArray());
+        assertEquals([], kira(50, 100).limit(kira([0, 1, 2, 3, 4, 5])).toArray());
     },
 
     "testIndex": function() {
-        assertSame(
+        assertEquals(
             [
                 [0, "a"],
                 [1, "b"],
@@ -170,6 +170,6 @@ TestCase("Kira Ranges module", {
     },
 
     "testToSet": function() {
-        assertSame({1: true, 2: true, 3: true, 4: true}, kira([1, 2, 3, 3, 4]).toSet());
+        assertEquals({1: true, 2: true, 3: true, 4: true}, kira([1, 2, 3, 3, 4]).toSet());
     }
 });

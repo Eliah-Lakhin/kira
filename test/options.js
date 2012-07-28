@@ -16,48 +16,48 @@
 
 TestCase("Kira Options module", {
     "testGetOption": function() {
-        assertSame([2], kira.options.getOption([1, 2, 3], 1));
-        assertSame([], kira.options.getOption([1, 2, 3], 5));
+        assertEquals([2], kira.options.getOption([1, 2, 3], 1));
+        assertEquals([], kira.options.getOption([1, 2, 3], 5));
 
-        assertSame([2], kira.options.get([1, 2, 3], 1));
-        assertSame([], kira.options.get([1, 2, 3], 5));
+        assertEquals([2], kira.options.get([1, 2, 3], 1));
+        assertEquals([], kira.options.get([1, 2, 3], 5));
     },
 
     "testGetOrElse": function() {
-        assertSame(2, kira.options.getOrElse([1, 2, 3], 1, 0));
-        assertSame(0, kira.options.getOrElse([1, 2, 3], 5, 0));
+        assertEquals(2, kira.options.getOrElse([1, 2, 3], 1, 0));
+        assertEquals(0, kira.options.getOrElse([1, 2, 3], 5, 0));
 
-        assertSame(2, kira.options.get([1, 2, 3], 1, 0));
-        assertSame(0, kira.options.get([1, 2, 3], 5, 0));
+        assertEquals(2, kira.options.get([1, 2, 3], 1, 0));
+        assertEquals(0, kira.options.get([1, 2, 3], 5, 0));
     },
 
     "testGetOrElseLazy": function() {
-        assertSame(2, kira.options.getOrElseLazy([1, 2, 3], 1, function() {return 0;}));
-        assertSame(0, kira.options.getOrElseLazy([1, 2, 3], 5, function() {return 0;}));
+        assertEquals(2, kira.options.getOrElseLazy([1, 2, 3], 1, function() {return 0;}));
+        assertEquals(0, kira.options.getOrElseLazy([1, 2, 3], 5, function() {return 0;}));
 
-        assertSame(2, kira.options.get([1, 2, 3], 1, function() {return 0;}));
-        assertSame(0, kira.options.get([1, 2, 3], 5, function() {return 0;}));
+        assertEquals(2, kira.options.get([1, 2, 3], 1, function() {return 0;}));
+        assertEquals(0, kira.options.get([1, 2, 3], 5, function() {return 0;}));
     },
 
     "testOrElseOption": function() {
-        assertSame([2], kira.options.orElseOption([1, 2, 3], 1, [0]));
-        assertSame([0], kira.options.orElseOption([1, 2, 3], 5, [0]));
+        assertEquals([2], kira.options.orElseOption([1, 2, 3], 1, [0]));
+        assertEquals([0], kira.options.orElseOption([1, 2, 3], 5, [0]));
 
-        assertSame([2], kira.options.orElse([1, 2, 3], 1, [0]));
-        assertSame([0], kira.options.orElse([1, 2, 3], 5, [0]));
+        assertEquals([2], kira.options.orElse([1, 2, 3], 1, [0]));
+        assertEquals([0], kira.options.orElse([1, 2, 3], 5, [0]));
     },
 
     "testOrElseLazy": function() {
-        assertSame([2], kira.options.orElseLazy([1, 2, 3], 1, function() {return [0];}));
-        assertSame([0], kira.options.orElseLazy([1, 2, 3], 5, function() {return [0];}));
+        assertEquals([2], kira.options.orElseLazy([1, 2, 3], 1, function() {return [0];}));
+        assertEquals([0], kira.options.orElseLazy([1, 2, 3], 5, function() {return [0];}));
 
-        assertSame([2], kira.options.orElse([1, 2, 3], 1, function() {return [0];}));
-        assertSame([0], kira.options.orElse([1, 2, 3], 5, function() {return [0];}));
+        assertEquals([2], kira.options.orElse([1, 2, 3], 1, function() {return [0];}));
+        assertEquals([0], kira.options.orElse([1, 2, 3], 5, function() {return [0];}));
     },
 
     "testNullable": function() {
-        assertSame([], Kira.nullable());
-        assertSame([], Kira.nullable(null));
-        assertSame([123], Kira.nullable(123));
+        assertEquals([], kira.options.nullable());
+        assertEquals([], kira.options.nullable(null));
+        assertEquals([123], kira.options.nullable(123));
     }
 });

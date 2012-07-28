@@ -154,7 +154,7 @@
 
         find: function(array, predicate) {
             var result;
-            return kira.any(array, function(value) {
+            return kira.arrays.any(array, function(value) {
                 if (predicate(value)) {
                     result = value;
                     return true;
