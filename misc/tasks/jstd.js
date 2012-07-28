@@ -30,7 +30,7 @@ module.exports = function(grunt) {
 
         var start = function() {
             grunt.verbose.writeln("Starting JsTestDriver server on port " + port + "...");
-            var command = "java -jar " + driver + " --config \"" + config + "\"";
+            var command = "java -jar " + driver;
             if (browsers) {
                 if (grunt.utils._.isString(browsers)) {
                     command += " --browser \"" + browsers + "\"";
@@ -71,15 +71,15 @@ module.exports = function(grunt) {
         }
     });
 
-    grunt.registerTask("jstd", "JsTestDriver unit test running", function() {
+    grunt.registerMultiTask("jstd", "JsTestDriver unit test running", function() {
         var done = this.async();
 
         grunt.config.requires("jstdServer");
         var driver = grunt.config.get("jstdServer").driver,
-            config = grunt.config.get("jstdServer").config;
+            config = this.data;
 
         grunt.verbose.writeln("Starting JsTestDriver unit test...");
-        var command = "java -jar " + driver + " --config " + config + " --tests all";
+        var command = "java -jar " + driver + " --reset --config " + config + " --tests all";
         grunt.verbose.writeln("Command to execute: " + command);
         var testProcess = exec(command, function(error, stdout, stderr) {
             if (error !== null) {

@@ -30,14 +30,14 @@ module.exports = function(grunt) {
                     "<file_strip_banner:src/modules/generators.js>",
                     "<file_strip_banner:src/modules/ranges.js>",
                     "<file_strip_banner:src/wrappers/outro.js>"],
-                dest: "build/<%= pkg.name %>.js",
+                dest: "build/full/<%= pkg.name %>-<%= pkg.version %>.js",
                 separator: "\n\n"
             }
         },
         min: {
             dist: {
-                src: "build/<%= pkg.name %>.js",
-                dest: "build/<%= pkg.name %>-min.js"
+                src: "build/full/<%= pkg.name %>-<%= pkg.version %>.js",
+                dest: "build/min/<%= pkg.name %>-<%= pkg.version %>-min.js"
             }
         },
         watch: {
@@ -46,9 +46,11 @@ module.exports = function(grunt) {
         },
         jstdServer: {
             port: 9876,
-            config: "test/kira.jstd",
-            driver: "lib/JsTestDriver.jar",
-            browsers: "chrome"
+            driver: "lib/JsTestDriver.jar"
+        },
+        jstd: {
+            full: "test/kira-full.jstd",
+            min: "test/kira-min.jstd"
         },
         jshint: {
             options: {
@@ -68,5 +70,9 @@ module.exports = function(grunt) {
 
     grunt.registerTask("build", "lint concat min");
 
-    grunt.registerTask("default", "build watch");
+    grunt.registerTask("build-test", "build jstd");
+
+    grunt.registerTask("build-watch", "build watch");
+
+    grunt.registerTask("default", "build");
 };

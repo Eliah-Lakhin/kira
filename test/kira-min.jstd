@@ -1,7 +1,10 @@
 server: http://localhost:9876
 
 load:
-  - "../build/Kira.js"
+  - "../build/min/Kira-*.js"
+
+exclude:
+  - "../build/full/Kira-*.js"
 
 test:
   - "base.js"
