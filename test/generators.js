@@ -115,7 +115,8 @@ TestCase("Kira Generators module", {
     },
 
     "testFold": function() {
-        assertSame(18, kira([0, 1, 3, 4]).fold(10, function(value, result) {return value + result;}));
+        assertSame(18, kira([0, 1, 3, 4]).fold(10, function(result, value) {return value + result;}));
+        assertSame("dcba", kira(["a", "b", "c", "d"]).fold("", function(result, value) {return value + result;}));
     },
 
     "testReduce": function() {

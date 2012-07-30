@@ -332,7 +332,7 @@
 
     kira.Generator.prototype.fold = function(init, folder) {
         for (var iterator = this.iterator(), element = iterator.next(); element !== undefined; element = iterator.next()) {
-            init = folder(element, init);
+            init = folder(init, element);
         }
         return init;
     };
