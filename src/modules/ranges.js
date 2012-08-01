@@ -88,14 +88,16 @@
 
     kira.Range.prototype.inject = function(injection) {
         if (this._defined && injection._defined) {
-            if (this._right <= injection._left) {
-                return new kira.Range(this._left, injection._right);
-            } else if (injection._right <= this._left) {
-                return new kira.Range(injection._left, this._right);
-            } else if (this._left <= injection._left) {
+            if (injection._right <= this._left) {
+                return new kira.Range(injection._left, this._right + injection._length);
+            } else if (injection._left <= this._left) {
+                return new kira.Range(injection._left, injection._right + this._length);
+            } else if (injection._right <= this._right) {
+                return new kira.Range(injection._left, this._right + injection._length);
+            } else if (injection._left <= this._right) {
                 return new kira.Range(this._left, this._right + injection._length);
             } else {
-                return new kira.Range(injection._left, injection._right + this._length);
+                return new kira.Range(this._left, injection._right);
             }
         } else if (this._defined) {
             return this;
