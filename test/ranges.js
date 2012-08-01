@@ -175,5 +175,13 @@ TestCase("Kira Ranges module", {
 
     "testReversedGenerator": function() {
         assertEquals([3, 2, 1, 0], kira(0, 4).toReversedGenerator().toArray());
+    },
+
+    "testTakeout": function() {
+        assertEquals([1, 2, 3], kira(1, 5).takeout(kira(2, 3)).toGenerator().toArray());
+        assertEquals([1], kira(1, 3).takeout(kira(2, 4)).toGenerator().toArray());
+        assertEquals([2], kira(1, 3).takeout(kira(0, 2)).toGenerator().toArray());
+        assertEquals([2, 3], kira(4, 6).takeout(kira(0, 2)).toGenerator().toArray());
+        assertEquals([1, 2], kira(1, 3).takeout(kira(10, 20)).toGenerator().toArray());
     }
 });

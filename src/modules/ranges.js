@@ -104,6 +104,22 @@
         }
     };
 
+    kira.Range.prototype.takeout = function(another) {
+        if (this._defined && another._defined) {
+            if (this._right <= another._left) {
+                return this;
+            } else if (another._right <= this._left) {
+                return new kira.Range(this._left - another._length, this._right - another._length);
+            } else if (this._left <= another._left) {
+                return new kira.Range(this._left, Math.max(this._right - another._length, another._left));
+            } else {
+                return new kira.Range(another._right, this._right - another._left);
+            }
+        } else {
+            return this;
+        }
+    };
+
     kira.Range.prototype.enlarge = function(pair) {
         if (this._defined) {
             return new kira.Range(this._left - pair[0], this._right + pair[1]);
