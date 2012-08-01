@@ -211,6 +211,27 @@
         }
     };
 
+    kira.Range.prototype.toReversedGenerator = function() {
+        var range = this;
+        if (this._defined) {
+            var result = new kira.Generator();
+            result.iterator = function() {
+                var cursor = range._right;
+                return {
+                    next: function() {
+                        cursor--;
+                        if (cursor >= range._left) {
+                            return cursor;
+                        }
+                    }
+                };
+            };
+            return result;
+        } else {
+            return kira.Generator.empty;
+        }
+    };
+
     kira.Range.prototype.toOption = function() {
         return this._defined ? [this] : [];
     };

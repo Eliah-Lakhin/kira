@@ -171,5 +171,9 @@ TestCase("Kira Ranges module", {
 
     "testToSet": function() {
         assertEquals({1: true, 2: true, 3: true, 4: true}, kira([1, 2, 3, 3, 4]).toSet());
+    },
+
+    "testReversedGenerator": function() {
+        assertEquals([3, 2, 1, 0], kira(0, 4).toReversedGenerator().toArray());
     }
 });
