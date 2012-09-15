@@ -35,6 +35,6 @@
                 block = message;
                 message = "%s";
             }
-            console.log(message.replace("%s", kira.profile(block)));
+            console.log(message.replace("%s", kira.console.profile(block)));
         }
     };

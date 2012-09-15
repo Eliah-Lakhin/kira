@@ -88,19 +88,37 @@
 
     kira.Range.prototype.inject = function(injection) {
         if (this._defined && injection._defined) {
-            if (this._right <= injection._left) {
-                return new kira.Range(this._left, injection._right);
-            } else if (injection._right <= this._left) {
-                return new kira.Range(injection._left, this._right);
-            } else if (this._left <= injection._left) {
+            if (injection._right <= this._left) {
+                return new kira.Range(injection._left, this._right + injection._length);
+            } else if (injection._left <= this._left) {
+                return new kira.Range(injection._left, injection._right + this._length);
+            } else if (injection._right <= this._right) {
+                return new kira.Range(injection._left, this._right + injection._length);
+            } else if (injection._left <= this._right) {
                 return new kira.Range(this._left, this._right + injection._length);
             } else {
-                return new kira.Range(injection._left, injection._right + this._length);
+                return new kira.Range(this._left, injection._right);
             }
         } else if (this._defined) {
             return this;
         } else {
             return injection;
+        }
+    };
+
+    kira.Range.prototype.takeout = function(another) {
+        if (this._defined && another._defined) {
+            if (this._right <= another._left) {
+                return this;
+            } else if (another._right <= this._left) {
+                return new kira.Range(this._left - another._length, this._right - another._length);
+            } else if (this._left <= another._left) {
+                return new kira.Range(this._left, Math.max(this._right - another._length, another._left));
+            } else {
+                return new kira.Range(another._right, this._right - another._left);
+            }
+        } else {
+            return this;
         }
     };
 
@@ -200,6 +218,27 @@
                     next: function() {
                         cursor++;
                         if (cursor < range._right) {
+                            return cursor;
+                        }
+                    }
+                };
+            };
+            return result;
+        } else {
+            return kira.Generator.empty;
+        }
+    };
+
+    kira.Range.prototype.toReversedGenerator = function() {
+        var range = this;
+        if (this._defined) {
+            var result = new kira.Generator();
+            result.iterator = function() {
+                var cursor = range._right;
+                return {
+                    next: function() {
+                        cursor--;
+                        if (cursor >= range._left) {
                             return cursor;
                         }
                     }
