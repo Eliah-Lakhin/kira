@@ -59,5 +59,19 @@ TestCase("Kira Options module", {
         assertEquals([], kira.options.nullable());
         assertEquals([], kira.options.nullable(null));
         assertEquals([123], kira.options.nullable(123));
+    },
+
+    "testDeployment": function() {
+        assertUndefined(window.nullable);
+        assertTrue(kira.installer.enable("kira.options"));
+        assertNotUndefined(window.nullable);
+
+        assertEquals(0, [1, 2, 3].get(5, function() {return 0;}));
+        assertEquals([3], [1, 2, 3].get(2));
+        assertEquals([9], [1, 2, 3].get(5).orElse(0, 9));
+
+        assertTrue(kira.installer.disable("kira.options"));
+        assertUndefined(window.nullable);
+        assertNotUndefined(kira.options.nullable);
     }
 });
