@@ -33,5 +33,33 @@ TestCase("Kira Functions module", {
             })
         };
         assertEquals("Baz12", foo.bar(1, 2));
+    },
+
+    "testDeployment": function() {
+        assertUndefined((function() {}).unbind);
+        assertTrue(kira.installer.enable("kira.functions"));
+        assertNotUndefined((function() {}).unbind);
+
+        assertEquals(
+            "bar12",
+            (function(x, y) {return this.foo + x + y}).bind({foo: "bar"})(1, 2)
+        );
+        var foo = {
+            baz: "Baz",
+            bar: (function(self, x, y) {
+                return self.baz + x + y;
+            }).unbind()
+        };
+        assertEquals("Baz12", foo.bar(1, 2));
+
+        assertTrue(kira.installer.disable("kira.functions"));
+        assertUndefined((function() {}).unbind);
+        assertEquals(
+            "bar12",
+            kira.functions.bind(
+                function(x, y) {return this.foo + x + y},
+                {foo: "bar"}
+            )(1, 2)
+        );
     }
 });
