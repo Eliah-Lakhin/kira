@@ -79,5 +79,17 @@ TestCase("Kira Arrays module", {
     "testToSet": function() {
         assertEquals({1: true, 2: true, 3: true, 4: true}, kira.arrays.toSet([1, 2, 3, 3, 4]));
         assertEquals({"h": true, "e": true, "l": true, "o": true}, kira.arrays.toSet("hello"));
+    },
+
+    "testDeployment": function() {
+        assertUndefined([].group);
+        assertTrue(kira.installer.enable("kira.arrays"));
+        assertNotUndefined([].group);
+
+        assertEquals([2, 4, 6], [1, 2, 3].map(function(value) {return value * 2;}));
+        assertEquals({1: ["a", "d"], 2: "bc"}, ["a", "bc", "d"].group(function(value) {return value.length;}));
+
+        assertTrue(kira.installer.disable("kira.arrays"));
+        assertUndefined([].group);
     }
 });
