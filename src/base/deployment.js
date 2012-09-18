@@ -19,22 +19,17 @@
 //////////////////////////////
 
     (function() {
-        var autoDeploy = context.kira !== undefined || context.kira.autoDeploy === true;
+        var settings = kira.objects.extend({
+            autoDeploy: false
+        }, context.kira);
 
-        kira.installer.deploy("kira", context, {
-            kira: kira
-        });
+        kira.installer.deploy("kira", context, {kira: kira});
 
         kira.noConflict = function() {
             kira.installer.disable("kira");
             kira.installer.uninstall("kira");
             return kira;
         };
-
-        kira.installer.install("kira.arrays", [
-            {
-            }
-        ]);
 
         var deployed = false,
             kiraModulePackages = kira.installer.getAllPackages("kira.*");
@@ -56,4 +51,8 @@
                 deployed = false;
             }
         };
+
+        if (settings.autoDeploy) {
+            kira.deploy();
+        }
     })();

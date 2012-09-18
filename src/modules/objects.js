@@ -25,9 +25,11 @@
             var result = {};
             for (var argumentIndex = 0, argumentLength = arguments.length; argumentIndex < argumentLength; argumentIndex++) {
                 var source = arguments[argumentIndex];
-                for (var field in source) {
-                    if (source.hasOwnProperty(field)) {
-                        result[field] = source[field];
+                if (source !== undefined) {
+                    for (var field in source) {
+                        if (source.hasOwnProperty(field)) {
+                            result[field] = source[field];
+                        }
                     }
                 }
             }
