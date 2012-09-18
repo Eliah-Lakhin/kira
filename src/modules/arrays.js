@@ -74,7 +74,7 @@
 
             each: function(array, step) {
                 if (array.forEach === nativeForEach && nativeForEach !== undefined) {
-                    return nativeForEach(array, step);
+                    return nativeForEach.call(array, step);
                 }
                 for (var index = 0, length = array.length; index < length; index++) {
                     step(array[index]);
