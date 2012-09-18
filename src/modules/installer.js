@@ -111,7 +111,7 @@
                     }
                     return true;
                 }
-                if (installedPackage.retainCount != 1) {
+                if (installedPackage.retainCount !== 1) {
                     return false;
                 }
                 for (var targetIndex = installedPackage.length - 1; targetIndex >= 0; targetIndex--) {

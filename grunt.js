@@ -8,6 +8,7 @@ module.exports = function(grunt) {
             grunt: "grunt.js",
             sources: [
                 "src/base.js",
+                "src/modules/installer.js",
                 "src/modules/typecheck.js",
                 "src/modules/console.js",
                 "src/modules/objects.js",
@@ -25,6 +26,7 @@ module.exports = function(grunt) {
                 src: ["<banner>",
                     "<file_strip_banner:src/wrappers/intro.js>",
                     "<file_strip_banner:src/base.js>",
+                    "<file_strip_banner:src/modules/installer.js>",
                     "<file_strip_banner:src/modules/typecheck.js>",
                     "<file_strip_banner:src/modules/console.js>",
                     "<file_strip_banner:src/modules/objects.js>",
