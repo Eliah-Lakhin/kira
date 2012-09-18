@@ -25,5 +25,13 @@ TestCase("Kira Base module", {
         assertUndefined(kira);
         assertNotUndefined(reference);
         kira = reference;
+    },
+
+    "testDeployment": function() {
+        assertUndefined([].group);
+        kira.deploy();
+        assertNotUndefined([].group);
+        kira.undeploy();
+        assertUndefined([].group);
     }
 });
