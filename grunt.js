@@ -16,7 +16,7 @@ module.exports = function(grunt) {
                 "src/modules/options.js",
                 "src/modules/generators.js",
                 "src/modules/ranges.js",
-                "src/modules/installation.js"
+                "src/modules/deployment.js"
             ]
         },
         clean: {
@@ -35,7 +35,7 @@ module.exports = function(grunt) {
                     "<file_strip_banner:src/modules/options.js>",
                     "<file_strip_banner:src/modules/generators.js>",
                     "<file_strip_banner:src/modules/ranges.js>",
-                    "<file_strip_banner:src/base/installation.js>",
+                    "<file_strip_banner:src/base/deployment.js>",
                     "<file_strip_banner:src/wrappers/outro.js>"],
                 dest: "build/full/<%= pkg.name %>-<%= pkg.version %>.js",
                 separator: "\n\n"
