@@ -8,9 +8,11 @@ exclude:
 
 test:
   - "base.js"
+  - "installer.js"
   - "typecheck.js"
   - "objects.js"
   - "arrays.js"
   - "options.js"
   - "generators.js"
   - "ranges.js"
+  - "functions.js"

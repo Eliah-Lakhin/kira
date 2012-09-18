@@ -18,42 +18,58 @@
 //          Objects         //
 //////////////////////////////
 
-    var nativeGetOwnPropertyNames = Object.getOwnPropertyNames;
+    kira.objects = (function() {
+        var nativeGetOwnPropertyNames = Object.getOwnPropertyNames;
 
-    kira.objects = {
-        extend: function() {
-            var result = {};
-            for (var argumentIndex = 0, argumentLength = arguments.length; argumentIndex < argumentLength; argumentIndex++) {
-                var source = arguments[argumentIndex];
-                for (var field in source) {
-                    if (source.hasOwnProperty(field)) {
-                        result[field] = source[field];
-                    }
-                }
-            }
-            return result;
-        },
-
-        append: function(target, key, value) {
-            if (value === undefined) {
-                target.push(key);
-            } else {
-                target[key] = value;
-            }
-            return target;
-        },
-
-        keys: function(object) {
-            if (nativeGetOwnPropertyNames !== undefined) {
-                return nativeGetOwnPropertyNames(object);
-            } else {
-                var result = [];
-                for (var property in object) {
-                    if (object.hasOwnProperty(property)) {
-                        result.push(property);
+        var objects = {
+            extend: function() {
+                var result = {};
+                for (var argumentIndex = 0, argumentLength = arguments.length; argumentIndex < argumentLength; argumentIndex++) {
+                    var source = arguments[argumentIndex];
+                    if (source !== undefined) {
+                        for (var field in source) {
+                            if (source.hasOwnProperty(field)) {
+                                result[field] = source[field];
+                            }
+                        }
                     }
                 }
                 return result;
+            },
+
+            append: function(target, key, value) {
+                if (value === undefined) {
+                    target.push(key);
+                } else {
+                    target[key] = value;
+                }
+                return target;
+            },
+
+            keys: function(object) {
+                if (nativeGetOwnPropertyNames !== undefined) {
+                    return nativeGetOwnPropertyNames(object);
+                } else {
+                    var result = [];
+                    for (var property in object) {
+                        if (object.hasOwnProperty(property)) {
+                            result.push(property);
+                        }
+                    }
+                    return result;
+                }
             }
-        }
-    };
+        };
+
+        kira.installer.install("kira.objects", [
+            {
+                source: {
+                    extend: kira.functions.unbind(objects.extend),
+                    keys: kira.functions.unbind(objects.keys)
+                },
+                destination: Object.prototype
+            }
+        ]);
+
+        return objects;
+    })();

@@ -15,7 +15,7 @@
  */
 
 //////////////////////////////
-//          Base            //
+//       Definition         //
 //////////////////////////////
 
     var kira = function(source) {
@@ -26,13 +26,4 @@
             var right = arguments[1] !== undefined && kira.typecheck.isNumber(arguments[1]) ? Math.ceil(arguments[1]) : left + 1;
             return new kira.Range(left, right);
         }
-    };
-
-    var conflicted = context.kira;
-
-    context.kira = kira;
-
-    kira.noConflict = function() {
-        context.kira = conflicted;
-        return kira;
     };

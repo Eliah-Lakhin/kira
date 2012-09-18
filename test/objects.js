@@ -29,5 +29,17 @@ TestCase("Kira Object module", {
 
     "testKeys": function() {
         assertEquals(3, kira.objects.keys({a: 1, b: 2, c: 3}).length);
+    },
+
+    "testDeployment": function() {
+        assertUndefined([].extend);
+        assertTrue(kira.installer.enable("kira.objects"));
+        assertNotUndefined([].extend);
+
+        assertEquals({a: 1, b: 2, c: 3}, {a: 1, b: 2}.extend({c: 3}));
+
+        assertTrue(kira.installer.disable("kira.objects"));
+        assertUndefined([].extend);
+        assertNotUndefined(kira.objects.extend);
     }
 });

@@ -51,3 +51,11 @@
             return Object.prototype.toString.call(candidate) === "[object RegExp]";
         }
     };
+
+    kira.installer.install("kira.typecheck", [
+        {
+            source: kira.typecheck,
+            destination: context,
+            safe: true
+        }
+    ]);

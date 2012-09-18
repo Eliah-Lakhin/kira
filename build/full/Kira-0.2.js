@@ -19,7 +19,7 @@
     var context = this;
 
 //////////////////////////////
-//          Base            //
+//       Definition         //
 //////////////////////////////
 
     var kira = function(source) {
@@ -32,14 +32,242 @@
         }
     };
 
-    var conflicted = context.kira;
+//////////////////////////////
+//        Installer         //
+//////////////////////////////
 
-    context.kira = kira;
+    kira.installer = (function() {
+        var installRegistry = {};
 
-    kira.noConflict = function() {
-        context.kira = conflicted;
-        return kira;
-    };
+        var installer = {
+            deploy: function(packageName, targets) {
+                if (installer.install(packageName, arguments[1], arguments[2])) {
+                    return installer.enable(packageName);
+                } else {
+                    return false;
+                }
+            },
+
+            install: function(packageName, targets) {
+                if (installer.isInstalled(packageName)) {
+                    return false;
+                }
+                if (Object.prototype.toString.call(targets) !== "[object Array]") {
+                    targets = [{
+                        destination: arguments[1],
+                        source: arguments[2],
+                        safe: false
+                    }];
+                }
+                installRegistry[packageName] = {
+                    retainCount: 0,
+                    targets: targets
+                };
+                return true;
+            },
+
+            uninstall: function(packageName) {
+                if (!installer.isInstalled(packageName) || installer.isEnabled(packageName)) {
+                    return false;
+                }
+                delete installRegistry[packageName];
+                return true;
+            },
+
+            isInstalled: function(packageName) {
+                return installRegistry[packageName] !== undefined;
+            },
+
+            isEnabled: function(packageName) {
+                return installRegistry[packageName] !== undefined && installRegistry[packageName].retainCount > 0;
+            },
+
+            getAllPackages: function(pattern) {
+                if (pattern.length > 1 && pattern.indexOf("*", pattern.length - 1) !== -1) {
+                    pattern = pattern.substr(0, pattern.length - 1);
+                    var result = [];
+                    for (var key in installRegistry) {
+                        if (installRegistry.hasOwnProperty(key) && key.indexOf(pattern, 0) === 0) {
+                            result.push(key);
+                        }
+                    }
+                    return result;
+                } else {
+                    return installRegistry[pattern] === undefined ? [] : [pattern];
+                }
+            },
+
+            enable: function(packageName, callback) {
+                if (!installer.isInstalled(packageName)) {
+                    return false;
+                }
+                var installedPackage = installRegistry[packageName];
+                if (callback !== undefined) {
+                    if (installer.enable(packageName)) {
+                        callback();
+                        installer.disable(packageName);
+                    } else {
+                        installedPackage.retainCount++;
+                        callback();
+                        installedPackage.retainCount--;
+                    }
+                    return true;
+                }
+                if (installedPackage.retainCount > 0) {
+                    return false;
+                }
+                installedPackage.retainCount = 1;
+                for (var targetIndex = 0, targetLength = installedPackage.targets.length; targetIndex < targetLength; targetIndex++) {
+                    var target = installedPackage.targets[targetIndex],
+                        source = target.source,
+                        destination = target.destination,
+                        safe = target.safe,
+                        obscuredFields = {};
+                    for (var fieldKey in source) {
+                        if (source.hasOwnProperty(fieldKey)) {
+                            if (!safe || destination[fieldKey] === undefined) {
+                                var newFieldValue = source[fieldKey];
+                                obscuredFields[fieldKey] = destination[fieldKey];
+                                destination[fieldKey] = newFieldValue;
+                            }
+                        }
+                    }
+                    target.obscuredFields = obscuredFields;
+                }
+                return true;
+            },
+
+            disable: function(packageName, callback) {
+                if (!installer.isInstalled(packageName)) {
+                    return false;
+                }
+                var installedPackage = installRegistry[packageName];
+                if (callback !== undefined) {
+                    if (installer.disable(packageName)) {
+                        callback();
+                        installer.enable(packageName);
+                    } else {
+                        var oldRetainCount = installedPackage.retainCount;
+                        installedPackage.retainCount = 1;
+                        installer.disable(packageName);
+                        callback();
+                        installer.enable(packageName);
+                        installedPackage.retainCount = oldRetainCount;
+                    }
+                    return true;
+                }
+                if (installedPackage.retainCount !== 1) {
+                    return false;
+                }
+                for (var targetIndex = installedPackage.targets.length - 1; targetIndex >= 0; targetIndex--) {
+                    var target = installedPackage.targets[targetIndex],
+                        source = target.source,
+                        destination = target.destination,
+                        obscuredFields = target.obscuredFields;
+                    for (var fieldKey in source) {
+                        if (source.hasOwnProperty(fieldKey)) {
+                            destination[fieldKey] = obscuredFields[fieldKey];
+                        }
+                    }
+                    delete target.obscuredFields;
+                }
+                installedPackage.retainCount = 0;
+                return true;
+            }
+        };
+
+        return installer;
+    })();
+
+//////////////////////////////
+//         Functions        //
+//////////////////////////////
+
+    kira.functions = (function() {
+        var nativeBind = Function.prototype.bind,
+            arraySlice = Array.prototype.slice;
+
+        var functions = {
+            bind: function(source, context) {
+                if (source.bind === nativeBind && nativeBind) {
+                    return nativeBind.apply(source, arraySlice.call(arguments, 1));
+                }
+                var constants = arraySlice.call(arguments, 2);
+                var bound = function() {
+                    var targetArguments = constants.concat(arraySlice.call(arguments));
+                    if (!(this instanceof bound)) {
+                        return source.apply(context, targetArguments);
+                    }
+                    var EmptyConstructor = function() {};
+                    EmptyConstructor.prototype = source.prototype;
+
+                    var self = new EmptyConstructor();
+                    var result = source.apply(self, targetArguments);
+                    if (Object(result) === result) {
+                        return result;
+                    }
+                    return self;
+                };
+                return bound;
+            },
+
+            unbind: function(source) {
+                return function() {
+                    var targetArguments = arraySlice.call(arguments);
+                    targetArguments.unshift(this);
+                    return source.apply(source, targetArguments);
+                };
+            },
+
+            asynchronous: function(source, timeout) {
+                if (timeout === undefined) {
+                    timeout = 0;
+                }
+                return function() {
+                    setTimeout(source, timeout);
+                };
+            },
+
+            limit: function(source, delay) {
+                var lastCall = 0;
+                return function() {
+                    var newCall = new Date().getTime();
+                    if (newCall - lastCall >= delay) {
+                        lastCall = newCall;
+                        source.apply(this, arguments);
+                    }
+                };
+            },
+
+            cache: function(source) {
+                var cache;
+                var executed = false;
+                return function() {
+                    if (!executed) {
+                        cache = source.apply(this, arguments);
+                        executed = true;
+                    }
+                    return cache;
+                };
+            }
+        };
+
+        kira.installer.install("kira.functions", [
+            {
+                source: {
+                    bind: functions.unbind(functions.bind),
+                    unbind: functions.unbind(functions.unbind),
+                    asynchronous: functions.unbind(functions.asynchronous),
+                    limit: functions.unbind(functions.limit),
+                    cache: functions.unbind(functions.cache)
+                },
+                destination: Function.prototype,
+                safe: true
+            }
+        ]);
+
+        return functions;
+    })();
 
 //////////////////////////////
 //         Typecheck        //
@@ -79,300 +307,407 @@
         }
     };
 
+    kira.installer.install("kira.typecheck", [
+        {
+            source: kira.typecheck,
+            destination: context,
+            safe: true
+        }
+    ]);
+
 //////////////////////////////
 //         Console          //
 //////////////////////////////
 
-    var console = context.console;
+    kira.console = (function() {
+        var nativeLog = context.console.log;
 
-    kira.console = {
-        log: function(message) {
-            console.log(message);
-            return message;
-        },
-        profile: function(block) {
-            var start = new Date().getTime();
-            block();
-            return new Date().getTime() - start;
-        },
-        logProfile: function(message, block) {
-            if (block === undefined) {
-                block = message;
-                message = "%s";
+        var console = {
+            watch: function(message) {
+                nativeLog(message);
+                return message;
+            },
+
+            profile: function(block) {
+                var start = new Date().getTime();
+                block();
+                return new Date().getTime() - start;
             }
-            console.log(message.replace("%s", kira.console.profile(block)));
-        }
-    };
+        };
+
+        kira.installer.install("kira.console", [
+            {
+                source: console,
+                destination: context.console
+            },
+            {
+                source: {
+                    watch: console.watch,
+                    profile: console.profile
+                },
+                destination: context,
+                safe: true
+            }
+        ]);
+
+        return console;
+    })();
 
 //////////////////////////////
 //          Objects         //
 //////////////////////////////
 
-    var nativeGetOwnPropertyNames = Object.getOwnPropertyNames;
+    kira.objects = (function() {
+        var nativeGetOwnPropertyNames = Object.getOwnPropertyNames;
 
-    kira.objects = {
-        extend: function() {
-            var result = {};
-            for (var argumentIndex = 0, argumentLength = arguments.length; argumentIndex < argumentLength; argumentIndex++) {
-                var source = arguments[argumentIndex];
-                for (var field in source) {
-                    if (source.hasOwnProperty(field)) {
-                        result[field] = source[field];
-                    }
-                }
-            }
-            return result;
-        },
-
-        append: function(target, key, value) {
-            if (value === undefined) {
-                target.push(key);
-            } else {
-                target[key] = value;
-            }
-            return target;
-        },
-
-        keys: function(object) {
-            if (nativeGetOwnPropertyNames !== undefined) {
-                return nativeGetOwnPropertyNames(object);
-            } else {
-                var result = [];
-                for (var property in object) {
-                    if (object.hasOwnProperty(property)) {
-                        result.push(property);
+        var objects = {
+            extend: function() {
+                var result = {};
+                for (var argumentIndex = 0, argumentLength = arguments.length; argumentIndex < argumentLength; argumentIndex++) {
+                    var source = arguments[argumentIndex];
+                    if (source !== undefined) {
+                        for (var field in source) {
+                            if (source.hasOwnProperty(field)) {
+                                result[field] = source[field];
+                            }
+                        }
                     }
                 }
                 return result;
+            },
+
+            append: function(target, key, value) {
+                if (value === undefined) {
+                    target.push(key);
+                } else {
+                    target[key] = value;
+                }
+                return target;
+            },
+
+            keys: function(object) {
+                if (nativeGetOwnPropertyNames !== undefined) {
+                    return nativeGetOwnPropertyNames(object);
+                } else {
+                    var result = [];
+                    for (var property in object) {
+                        if (object.hasOwnProperty(property)) {
+                            result.push(property);
+                        }
+                    }
+                    return result;
+                }
             }
-        }
-    };
+        };
+
+        kira.installer.install("kira.objects", [
+            {
+                source: {
+                    extend: kira.functions.unbind(objects.extend),
+                    keys: kira.functions.unbind(objects.keys)
+                },
+                destination: Object.prototype
+            }
+        ]);
+
+        return objects;
+    })();
 
 //////////////////////////////
 //          Arrays          //
 //////////////////////////////
 
-    var nativeForEach = Array.prototype.forEach,
-        nativeFilter = Array.prototype.filter,
-        nativeMap = Array.prototype.map,
-        nativeEvery = Array.prototype.every,
-        nativeSome = Array.prototype.some,
-        nativeReduce = Array.prototype.reduce,
-        nativeIndexOf = Array.prototype.indexOf;
+    kira.arrays = (function() {
+        var nativeForEach = Array.prototype.forEach,
+            nativeFilter = Array.prototype.filter,
+            nativeMap = Array.prototype.map,
+            nativeEvery = Array.prototype.every,
+            nativeSome = Array.prototype.some,
+            nativeReduce = Array.prototype.reduce,
+            nativeIndexOf = Array.prototype.indexOf;
 
-    kira.arrays = {
-        map: function(array, functor) {
-            if (array.map === nativeMap && nativeMap !== undefined) {
-                return array.map(functor);
-            }
-            var result = [];
-            for (var index = 0, length = array.length; index < length; index++) {
-                result.push(functor(array[index]));
-            }
-            return result;
-        },
-
-        flat: function(array, functor) {
-            var result = [];
-            for (var index = 0, length = array.length; index < length; index++) {
-                var subResult = functor(array[index]);
-                for (var subResultIndex = 0, subResultLength = subResult.length; subResultIndex < subResultLength; subResultIndex++) {
-                    result.push(subResult[subResultIndex]);
+        var arrays = {
+            map: function(array, functor) {
+                if (array.map === nativeMap && nativeMap !== undefined) {
+                    return nativeMap.call(array, functor);
                 }
-            }
-            return result;
-        },
-
-        filter: function(array, predicate) {
-            if (array.filter === nativeFilter && nativeFilter !== undefined) {
-                return array.filter(predicate);
-            }
-            var result = [];
-            for (var index = 0, length = array.length; index < length; index++) {
-                var element = array[index];
-                if (predicate(element)) {
-                    result.push(element);
-                }
-            }
-            return result;
-        },
-
-        zip: function(left, right) {
-            var result = [];
-            for (var index = 0, length = Math.min(left.length, right.length); index < length; index++) {
-                result.push([left[index], right[index]]);
-            }
-            return result;
-        },
-
-        each: function(array, step) {
-            if (array.forEach === nativeForEach && nativeForEach !== undefined) {
-                return array.forEach(step);
-            }
-            for (var index = 0, length = array.length; index < length; index++) {
-                step(array[index]);
-            }
-        },
-
-        group: function(array, mapping) {
-            var result = {};
-            for (var index = 0, length = array.length; index < length; index++) {
-                var value = array[index];
-                var key = mapping(value);
-                if (result[key] === undefined) {
-                    result[key] = [value];
-                } else {
-                    result[key].push(value);
-                }
-            }
-            return result;
-        },
-
-        all: function(array, predicate) {
-            if (array.every === nativeEvery && nativeEvery !== undefined) {
-                return array.every(predicate);
-            }
-            for (var index = 0, length = array.length; index < length; index++) {
-                if (!predicate(array[index])) {
-                    return false;
-                }
-            }
-            return true;
-        },
-
-        any: function(array, predicate) {
-            if (array.some === nativeSome && nativeSome !== undefined) {
-                return array.some(predicate);
-            }
-            for (var index = 0, length = array.length; index < length; index++) {
-                if (!predicate(array[index])) {
-                    return false;
-                }
-            }
-            return true;
-        },
-
-        reduce: function(array, folder) {
-            if (array.reduce === nativeReduce && nativeReduce !== undefined) {
-                try {
-                    return [array.reduce(folder)];
-                } catch (error) {
-                    if (error.type === "reduce_no_initial") {
-                        return [];
-                    } else {
-                        throw error;
-                    }
-                }
-            }
-            var length = array.length;
-            if (length > 0) {
-                var result = array[0];
-                for (var index = 1; index < length; index++) {
-                    result = folder(result, array[index]);
-                }
-                return [result];
-            } else {
-                return [];
-            }
-        },
-
-        fold: function(array, init, folder) {
-            if (array.reduce === nativeReduce && nativeReduce !== undefined) {
-                return array.reduce(folder, init);
-            }
-            for (var index = 0, length = array.length; index < length; index++) {
-                init = folder(init, array[index]);
-            }
-            return init;
-        },
-
-        find: function(array, predicate) {
-            var result;
-            return kira.arrays.any(array, function(value) {
-                if (predicate(value)) {
-                    result = value;
-                    return true;
-                } else {
-                    return false;
-                }
-            }) ? [result] : [];
-        },
-
-        indexOf: function(array, element) {
-            if (array.indexOf === nativeIndexOf && nativeIndexOf !== undefined) {
-                var result = array.indexOf(element);
-                return result >= 0 ? [result] : [];
-            } else {
+                var result = [];
                 for (var index = 0, length = array.length; index < length; index++) {
-                    if (array[index] === element) {
-                        return [index];
+                    result.push(functor(array[index]));
+                }
+                return result;
+            },
+
+            flat: function(array, functor) {
+                var result = [];
+                for (var index = 0, length = array.length; index < length; index++) {
+                    var subResult = functor(array[index]);
+                    for (var subResultIndex = 0, subResultLength = subResult.length; subResultIndex < subResultLength; subResultIndex++) {
+                        result.push(subResult[subResultIndex]);
                     }
                 }
-                return [];
-            }
-        },
+                return result;
+            },
 
-        toSet: function(array) {
-            var result = {};
-            for (var index = 0, length = array.length; index < length; index++) {
-                result[array[index]] = true;
+            filter: function(array, predicate) {
+                if (array.filter === nativeFilter && nativeFilter !== undefined) {
+                    return nativeFilter.call(array, predicate);
+                }
+                var result = [];
+                for (var index = 0, length = array.length; index < length; index++) {
+                    var element = array[index];
+                    if (predicate(element)) {
+                        result.push(element);
+                    }
+                }
+                return result;
+            },
+
+            zip: function(left, right) {
+                var result = [];
+                for (var index = 0, length = Math.min(left.length, right.length); index < length; index++) {
+                    result.push([left[index], right[index]]);
+                }
+                return result;
+            },
+
+            each: function(array, step) {
+                if (array.forEach === nativeForEach && nativeForEach !== undefined) {
+                    return nativeForEach.call(array, step);
+                }
+                for (var index = 0, length = array.length; index < length; index++) {
+                    step(array[index]);
+                }
+            },
+
+            group: function(array, mapping) {
+                var result = {};
+                for (var index = 0, length = array.length; index < length; index++) {
+                    var value = array[index];
+                    var key = mapping(value);
+                    if (result[key] === undefined) {
+                        result[key] = [value];
+                    } else {
+                        result[key].push(value);
+                    }
+                }
+                return result;
+            },
+
+            all: function(array, predicate) {
+                if (array.every === nativeEvery && nativeEvery !== undefined) {
+                    return nativeEvery.call(array, predicate);
+                }
+                for (var index = 0, length = array.length; index < length; index++) {
+                    if (!predicate(array[index])) {
+                        return false;
+                    }
+                }
+                return true;
+            },
+
+            any: function(array, predicate) {
+                if (array.some === nativeSome && nativeSome !== undefined) {
+                    return nativeSome.call(array, predicate);
+                }
+                for (var index = 0, length = array.length; index < length; index++) {
+                    if (!predicate(array[index])) {
+                        return false;
+                    }
+                }
+                return true;
+            },
+
+            reduce: function(array, folder) {
+                if (array.reduce === nativeReduce && nativeReduce !== undefined) {
+                    try {
+                        return [nativeReduce.call(array, folder)];
+                    } catch (error) {
+                        if (error.type === "reduce_no_initial") {
+                            return [];
+                        } else {
+                            throw error;
+                        }
+                    }
+                }
+                var length = array.length;
+                if (length > 0) {
+                    var result = array[0];
+                    for (var index = 1; index < length; index++) {
+                        result = folder(result, array[index]);
+                    }
+                    return [result];
+                } else {
+                    return [];
+                }
+            },
+
+            fold: function(array, init, folder) {
+                if (array.reduce === nativeReduce && nativeReduce !== undefined) {
+                    return nativeReduce.call(array, folder, init);
+                }
+                for (var index = 0, length = array.length; index < length; index++) {
+                    init = folder(init, array[index]);
+                }
+                return init;
+            },
+
+            find: function(array, predicate) {
+                var result;
+                return arrays.any(array, function(value) {
+                    if (predicate(value)) {
+                        result = value;
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }) ? [result] : [];
+            },
+
+            indexOf: function(array, element) {
+                if (array.indexOf === nativeIndexOf && nativeIndexOf !== undefined) {
+                    var result = nativeIndexOf.call(array, element);
+                    return result >= 0 ? [result] : [];
+                } else {
+                    for (var index = 0, length = array.length; index < length; index++) {
+                        if (array[index] === element) {
+                            return [index];
+                        }
+                    }
+                    return [];
+                }
+            },
+
+            toSet: function(array) {
+                var result = {};
+                for (var index = 0, length = array.length; index < length; index++) {
+                    result[array[index]] = true;
+                }
+                return result;
+            },
+
+            toGenerator: function(array) {
+                return new kira.Generator(array);
             }
-            return result;
+        };
+
+        var deploymentSource = {
+            flat: kira.functions.unbind(arrays.flat),
+            zip: kira.functions.unbind(arrays.zip),
+            each: nativeForEach,
+            group: kira.functions.unbind(arrays.group),
+            all: nativeEvery,
+            any: nativeSome,
+            reduce: kira.functions.unbind(arrays.reduce),
+            fold: kira.functions.unbind(arrays.fold),
+            find: kira.functions.unbind(arrays.find),
+            indexOf: kira.functions.unbind(arrays.indexOf),
+            toSet: kira.functions.unbind(arrays.toSet),
+            toGenerator: kira.functions.unbind(arrays.toGenerator)
+
+        };
+        if (nativeMap === undefined) {
+            deploymentSource.map = kira.functions.unbind(arrays.map);
         }
-    };
+        if (nativeFilter === undefined) {
+            deploymentSource.filter = kira.functions.unbind(arrays.filter);
+        }
+        if (nativeForEach === undefined) {
+            deploymentSource.each = kira.functions.unbind(arrays.each);
+        }
+        if (nativeEvery === undefined) {
+            deploymentSource.all = kira.functions.unbind(arrays.all);
+        }
+        if (nativeSome === undefined) {
+            deploymentSource.any = kira.functions.unbind(arrays.any);
+        }
+        if (nativeSome === undefined) {
+            deploymentSource.any = kira.functions.unbind(arrays.any);
+        }
+
+        kira.installer.install("kira.arrays", [
+            {
+                source: deploymentSource,
+                destination: Array.prototype
+            }
+        ]);
+
+        return arrays;
+    })();
 
 //////////////////////////////
 //         Options          //
 //////////////////////////////
 
-    kira.options = {
-        get: function(object, key, defaultValue) {
-            if (defaultValue === undefined) {
-                return kira.options.getOption(object, key);
-            } else if (kira.typecheck.isFunction(defaultValue)) {
-                return kira.options.getOrElseLazy(object, key, defaultValue);
-            } else {
-                return kira.options.getOrElse(object, key, defaultValue);
+    kira.options = (function() {
+        var options = {
+            get: function(object, key, defaultValue) {
+                if (defaultValue === undefined) {
+                    return kira.options.getOption(object, key);
+                } else if (kira.typecheck.isFunction(defaultValue)) {
+                    return kira.options.getOrElseLazy(object, key, defaultValue);
+                } else {
+                    return kira.options.getOrElse(object, key, defaultValue);
+                }
+            },
+
+            getOption: function(object, key) {
+                var result = object[key];
+                return result === undefined ? [] : [result];
+            },
+
+            getOrElse: function(object, key, defaultValue) {
+                var result = object[key];
+                return result === undefined ? defaultValue : result;
+            },
+
+            getOrElseLazy: function(object, key, defaultValue) {
+                var result = object[key];
+                return result === undefined ? defaultValue() : result;
+            },
+
+            orElse: function(object, key, defaultValue) {
+                if (kira.typecheck.isFunction(defaultValue)) {
+                    return kira.options.orElseLazy(object, key, defaultValue);
+                } else {
+                    return kira.options.orElseOption(object, key, defaultValue);
+                }
+            },
+
+            orElseOption: function(object, key, defaultValue) {
+                var result = object[key];
+                return result === undefined ? defaultValue : [result];
+            },
+
+            orElseLazy: function(object, key, defaultValue) {
+                var result = object[key];
+                return result === undefined ? defaultValue() : [result];
+            },
+
+            nullable: function(nullable) {
+                return nullable === null || nullable === undefined ? [] : [nullable];
             }
-        },
+        };
 
-        getOption: function(object, key) {
-            var result = object[key];
-            return result === undefined ? [] : [result];
-        },
-
-        getOrElse: function(object, key, defaultValue) {
-            var result = object[key];
-            return result === undefined ? defaultValue : result;
-        },
-
-        getOrElseLazy: function(object, key, defaultValue) {
-            var result = object[key];
-            return result === undefined ? defaultValue() : result;
-        },
-
-        orElse: function(object, key, defaultValue) {
-            if (kira.typecheck.isFunction(defaultValue)) {
-                return kira.options.orElseLazy(object, key, defaultValue);
-            } else {
-                return kira.options.orElseOption(object, key, defaultValue);
+        kira.installer.install("kira.options", [
+            {
+                source: {
+                    get: kira.functions.unbind(options.get),
+                    orElse: kira.functions.unbind(options.orElse)
+                },
+                destination: Object.prototype
+            },
+            {
+                source: {
+                    nullable: options.nullable
+                },
+                destination: context,
+                safe: true
             }
-        },
+        ]);
 
-        orElseOption: function(object, key, defaultValue) {
-            var result = object[key];
-            return result === undefined ? defaultValue : [result];
-        },
-
-        orElseLazy: function(object, key, defaultValue) {
-            var result = object[key];
-            return result === undefined ? defaultValue() : [result];
-        },
-
-        nullable: function(nullable) {
-            return nullable === null || nullable === undefined ? [] : [nullable];
-        }
-    };
+        return options;
+    })();
 
 //////////////////////////////
 //        Generators        //
@@ -1004,5 +1339,48 @@
     kira.Range.prototype.toString = function() {
         return this._defined ? "Range(" + this._left + ", " + this._right + ")" : "Range()";
     };
+
+//////////////////////////////
+//       Deployment         //
+//////////////////////////////
+
+    (function() {
+        var settings = kira.objects.extend({
+            autoDeploy: false
+        }, context.kira);
+
+        kira.installer.deploy("kira", context, {kira: kira});
+
+        kira.noConflict = function() {
+            kira.installer.disable("kira");
+            kira.installer.uninstall("kira");
+            return kira;
+        };
+
+        var deployed = false,
+            kiraModulePackages = kira.installer.getAllPackages("kira.*");
+
+        kira.deploy = function() {
+            if (!deployed) {
+                deployed = true;
+                kira.arrays.each(kiraModulePackages, function(packageName) {
+                    kira.installer.enable(packageName);
+                });
+            }
+        };
+
+        kira.undeploy = function() {
+            if (deployed) {
+                kira.arrays.each(kiraModulePackages, function(packageName) {
+                    kira.installer.disable(packageName);
+                });
+                deployed = false;
+            }
+        };
+
+        if (settings.autoDeploy) {
+            kira.deploy();
+        }
+    })();
 
 })();

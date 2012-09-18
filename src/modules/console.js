@@ -18,23 +18,36 @@
 //         Console          //
 //////////////////////////////
 
-    var console = context.console;
+    kira.console = (function() {
+        var nativeLog = context.console.log;
 
-    kira.console = {
-        log: function(message) {
-            console.log(message);
-            return message;
-        },
-        profile: function(block) {
-            var start = new Date().getTime();
-            block();
-            return new Date().getTime() - start;
-        },
-        logProfile: function(message, block) {
-            if (block === undefined) {
-                block = message;
-                message = "%s";
+        var console = {
+            watch: function(message) {
+                nativeLog(message);
+                return message;
+            },
+
+            profile: function(block) {
+                var start = new Date().getTime();
+                block();
+                return new Date().getTime() - start;
             }
-            console.log(message.replace("%s", kira.console.profile(block)));
-        }
-    };
+        };
+
+        kira.installer.install("kira.console", [
+            {
+                source: console,
+                destination: context.console
+            },
+            {
+                source: {
+                    watch: console.watch,
+                    profile: console.profile
+                },
+                destination: context,
+                safe: true
+            }
+        ]);
+
+        return console;
+    })();
