@@ -8,7 +8,7 @@ module.exports = function(grunt) {
             grunt: "grunt.js",
             sources: [
                 "src/base/definition.js",
-                "src/base/installer.js",
+                "src/modules/installer.js",
                 "src/modules/typecheck.js",
                 "src/modules/console.js",
                 "src/modules/objects.js",
@@ -16,7 +16,8 @@ module.exports = function(grunt) {
                 "src/modules/options.js",
                 "src/modules/generators.js",
                 "src/modules/ranges.js",
-                "src/modules/deployment.js"
+                "src/modules/functions.js",
+                "src/base/deployment.js"
             ]
         },
         clean: {
@@ -35,6 +36,7 @@ module.exports = function(grunt) {
                     "<file_strip_banner:src/modules/options.js>",
                     "<file_strip_banner:src/modules/generators.js>",
                     "<file_strip_banner:src/modules/ranges.js>",
+                    "<file_strip_banner:src/modules/functions.js>",
                     "<file_strip_banner:src/base/deployment.js>",
                     "<file_strip_banner:src/wrappers/outro.js>"],
                 dest: "build/full/<%= pkg.name %>-<%= pkg.version %>.js",
