@@ -42,5 +42,18 @@ TestCase("Kira Installer module", {
         assertTrue(kira.installer.uninstall("test.custom.sin"));
         assertFalse(kira.installer.uninstall("test.custom.sin"));
         assertFalse(kira.installer.enable("test.custom.sin"));
+    },
+
+    "testMultiPackage": function() {
+        var customMath = {
+            sin: function() {
+                return "custom sine";
+            }
+        };
+        assertTrue(kira.installer.install("test.custom.sin", Math, customMath));
+        kira.arrays.each(kira.installer.getAllPackages("test.*"), function(packageName) {
+            assertTrue(kira.installer.uninstall(packageName));
+        });
+        assertFalse(kira.installer.uninstall("test.custom.sin"));
     }
 });

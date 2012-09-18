@@ -55,6 +55,21 @@
                 return installRegistry[packageName] !== undefined && installRegistry[packageName].retainCount > 0;
             },
 
+            getAllPackages: function(pattern) {
+                if (pattern.length > 2 && pattern.indexOf(".*", pattern.length - 2) !== -1) {
+                    pattern = pattern.substr(0, pattern.length - 2);
+                    var result = [];
+                    for (var key in installRegistry) {
+                        if (installRegistry.hasOwnProperty(key) && key.indexOf(pattern, 0) === 0) {
+                            result.push(key);
+                        }
+                    }
+                    return result;
+                } else {
+                    return installRegistry[pattern] === undefined ? [] : [pattern];
+                }
+            },
+
             enable: function(packageName, callback) {
                 if (!installer.isInstalled(packageName)) {
                     return false;
