@@ -8,6 +8,7 @@ exclude:
 
 test:
   - "base.js"
+  - "installer.js"
   - "typecheck.js"
   - "objects.js"
   - "arrays.js"
