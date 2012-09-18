@@ -15,24 +15,15 @@
  */
 
 //////////////////////////////
-//          Base            //
+//      Installation        //
 //////////////////////////////
 
-    var kira = function(source) {
-        if (kira.typecheck.isArray(source) || kira.typecheck.isObject(source)) {
-            return new kira.Generator(source);
-        } else if (kira.typecheck.isNumber(source)) {
-            var left = Math.floor(source);
-            var right = arguments[1] !== undefined && kira.typecheck.isNumber(arguments[1]) ? Math.ceil(arguments[1]) : left + 1;
-            return new kira.Range(left, right);
-        }
-    };
-
-    var conflicted = context.kira;
-
-    context.kira = kira;
+    kira.installer.deploy("kira", context, {
+        kira: kira
+    });
 
     kira.noConflict = function() {
-        context.kira = conflicted;
+        kira.installer.disable("kira");
+        kira.installer.uninstall("kira");
         return kira;
     };

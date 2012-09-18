@@ -22,6 +22,14 @@
         var installRegistry = {};
 
         var installer = {
+            deploy: function(packageName, targets) {
+                if (installer.install(packageName, arguments[1], arguments[2])) {
+                    return installer.enable(packageName);
+                } else {
+                    return false;
+                }
+            },
+
             install: function(packageName, targets) {
                 if (installer.isInstalled(packageName)) {
                     return false;
