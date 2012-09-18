@@ -75,7 +75,7 @@
                     return false;
                 }
                 installedPackage.retainCount = 1;
-                for (var targetIndex = 0, targetLength = installedPackage.length; targetIndex < targetLength; targetIndex++) {
+                for (var targetIndex = 0, targetLength = installedPackage.targets.length; targetIndex < targetLength; targetIndex++) {
                     var target = installedPackage.targets[targetIndex],
                         source = target.source,
                         destination = target.destination,
@@ -114,7 +114,7 @@
                 if (installedPackage.retainCount !== 1) {
                     return false;
                 }
-                for (var targetIndex = installedPackage.length - 1; targetIndex >= 0; targetIndex--) {
+                for (var targetIndex = installedPackage.targets.length - 1; targetIndex >= 0; targetIndex--) {
                     var target = installedPackage.targets[targetIndex],
                         source = target.source,
                         destination = target.destination,
