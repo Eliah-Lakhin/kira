@@ -34,7 +34,7 @@
                 if (installer.isInstalled(packageName)) {
                     return false;
                 }
-                if (!kira.typecheck.isArray(targets)) {
+                if (Object.prototype.toString.call(targets) !== "[object Array]") {
                     targets = [{
                         destination: arguments[1],
                         source: arguments[2],
