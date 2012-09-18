@@ -18,51 +18,72 @@
 //         Options          //
 //////////////////////////////
 
-    kira.options = {
-        get: function(object, key, defaultValue) {
-            if (defaultValue === undefined) {
-                return kira.options.getOption(object, key);
-            } else if (kira.typecheck.isFunction(defaultValue)) {
-                return kira.options.getOrElseLazy(object, key, defaultValue);
-            } else {
-                return kira.options.getOrElse(object, key, defaultValue);
+    kira.options = (function() {
+        var options = {
+            get: function(object, key, defaultValue) {
+                if (defaultValue === undefined) {
+                    return kira.options.getOption(object, key);
+                } else if (kira.typecheck.isFunction(defaultValue)) {
+                    return kira.options.getOrElseLazy(object, key, defaultValue);
+                } else {
+                    return kira.options.getOrElse(object, key, defaultValue);
+                }
+            },
+
+            getOption: function(object, key) {
+                var result = object[key];
+                return result === undefined ? [] : [result];
+            },
+
+            getOrElse: function(object, key, defaultValue) {
+                var result = object[key];
+                return result === undefined ? defaultValue : result;
+            },
+
+            getOrElseLazy: function(object, key, defaultValue) {
+                var result = object[key];
+                return result === undefined ? defaultValue() : result;
+            },
+
+            orElse: function(object, key, defaultValue) {
+                if (kira.typecheck.isFunction(defaultValue)) {
+                    return kira.options.orElseLazy(object, key, defaultValue);
+                } else {
+                    return kira.options.orElseOption(object, key, defaultValue);
+                }
+            },
+
+            orElseOption: function(object, key, defaultValue) {
+                var result = object[key];
+                return result === undefined ? defaultValue : [result];
+            },
+
+            orElseLazy: function(object, key, defaultValue) {
+                var result = object[key];
+                return result === undefined ? defaultValue() : [result];
+            },
+
+            nullable: function(nullable) {
+                return nullable === null || nullable === undefined ? [] : [nullable];
             }
-        },
+        };
 
-        getOption: function(object, key) {
-            var result = object[key];
-            return result === undefined ? [] : [result];
-        },
-
-        getOrElse: function(object, key, defaultValue) {
-            var result = object[key];
-            return result === undefined ? defaultValue : result;
-        },
-
-        getOrElseLazy: function(object, key, defaultValue) {
-            var result = object[key];
-            return result === undefined ? defaultValue() : result;
-        },
-
-        orElse: function(object, key, defaultValue) {
-            if (kira.typecheck.isFunction(defaultValue)) {
-                return kira.options.orElseLazy(object, key, defaultValue);
-            } else {
-                return kira.options.orElseOption(object, key, defaultValue);
+        kira.installer.install("kira.options", [
+            {
+                source: {
+                    get: kira.functions.unbind(options.get),
+                    orElse: kira.functions.unbind(options.orElse)
+                },
+                destination: Object.prototype
+            },
+            {
+                source: {
+                    nullable: options.nullable
+                },
+                destination: context,
+                safe: true
             }
-        },
+        ]);
 
-        orElseOption: function(object, key, defaultValue) {
-            var result = object[key];
-            return result === undefined ? defaultValue : [result];
-        },
-
-        orElseLazy: function(object, key, defaultValue) {
-            var result = object[key];
-            return result === undefined ? defaultValue() : [result];
-        },
-
-        nullable: function(nullable) {
-            return nullable === null || nullable === undefined ? [] : [nullable];
-        }
-    };
+        return options;
+    })();
