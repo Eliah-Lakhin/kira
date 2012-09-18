@@ -22,7 +22,7 @@
         var nativeBind = Function.prototype.bind,
             arraySlice = Array.prototype.slice;
 
-        return {
+        var functions = {
             bind: function(source, context) {
                 if (source.bind === nativeBind && nativeBind) {
                     return nativeBind.apply(source, arraySlice.call(arguments, 1));
@@ -86,4 +86,20 @@
                 };
             }
         };
+
+        kira.installer.install("kira.functions", [
+            {
+                source: {
+                    bind: functions.unbind(functions.bind),
+                    unbind: functions.unbind(functions.unbind),
+                    asynchronous: functions.unbind(functions.asynchronous),
+                    limit: functions.unbind(functions.limit),
+                    cache: functions.unbind(functions.cache)
+                },
+                destination: Function.prototype,
+                safe: true
+            }
+        ]);
+
+        return functions;
     })();
