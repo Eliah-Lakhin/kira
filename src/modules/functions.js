@@ -19,16 +19,17 @@
 //////////////////////////////
 
     kira.functions = (function() {
-        var nativeBind = Function.prototype.bind;
+        var nativeBind = Function.prototype.bind,
+            arraySlice = Array.prototype.slice;
 
         return {
             bind: function(source, context) {
                 if (source.bind === nativeBind && nativeBind) {
-                    return nativeBind.apply(source, slice.call(arguments, 1));
+                    return nativeBind.apply(source, arraySlice.call(arguments, 1));
                 }
-                var constants = Array.prototype.slice.call(arguments, 2);
+                var constants = arraySlice.call(arguments, 2);
                 var bound = function() {
-                    var targetArguments = constants.concat(Array.prototype.slice.call(arguments));
+                    var targetArguments = constants.concat(arraySlice.call(arguments));
                     if (!(this instanceof bound)) {
                         return source.apply(context, targetArguments);
                     }
@@ -47,7 +48,7 @@
 
             unbind: function(source) {
                 return function() {
-                    var targetArguments = nativeSlice.call(arguments);
+                    var targetArguments = arraySlice.call(arguments);
                     targetArguments.unshift(this);
                     return source.apply(source, targetArguments);
                 };
