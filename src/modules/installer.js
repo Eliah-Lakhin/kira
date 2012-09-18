@@ -37,7 +37,8 @@
                 if (!kira.typecheck.isArray(targets)) {
                     targets = [{
                         destination: arguments[1],
-                        source: arguments[2]
+                        source: arguments[2],
+                        safe: false
                     }];
                 }
                 installRegistry[packageName] = {
@@ -102,12 +103,15 @@
                     var target = installedPackage.targets[targetIndex],
                         source = target.source,
                         destination = target.destination,
+                        safe = target.safe,
                         obscuredFields = {};
                     for (var fieldKey in source) {
                         if (source.hasOwnProperty(fieldKey)) {
-                            var newFieldValue = source[fieldKey];
-                            obscuredFields[fieldKey] = destination[fieldKey];
-                            destination[fieldKey] = newFieldValue;
+                            if (!safe || destination[fieldKey] === undefined) {
+                                var newFieldValue = source[fieldKey];
+                                obscuredFields[fieldKey] = destination[fieldKey];
+                                destination[fieldKey] = newFieldValue;
+                            }
                         }
                     }
                     target.obscuredFields = obscuredFields;
